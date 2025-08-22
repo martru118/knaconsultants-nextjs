@@ -16,7 +16,7 @@ export async function checkUser() {
 
     // generate dummy username based on slug
     const name = `${user.firstName} ${user.lastName}`;
-    const slug = name.split(" ").join("-") + user.id.slice(-4);
+    const slug = name.toLowerCase().split(" ").join("-") + user.id.slice(-4);
     (await clerkClient()).users.updateUser(user.id, {
       username: slug
     })
