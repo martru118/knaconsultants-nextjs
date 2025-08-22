@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
+import CreateEventDrawer from "@/components/CreateEventDrawer";
 
 export const metadata: Metadata = {
   title: "Schedulrr",
@@ -29,6 +30,8 @@ export default function RootLayout({
               <p>© Copyright {new Date().getFullYear()} K & A Consulting LLC.</p>
             </div>
           </footer>
+
+          <CreateEventDrawer />
         </body>
       </html>
     </ClerkProvider>

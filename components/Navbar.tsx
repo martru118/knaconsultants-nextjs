@@ -22,14 +22,12 @@ async function Navbar() {
       </Link>
 
       <div className="flex items-center gap-4">
-        {/* TODO: Create events button
         <Link href="/events?create=true">
           <Button className="flex items-center gap-2">
             <PenBox size={18} />
             Create Event
           </Button>
         </Link>
-        */}
 
         <SignedOut>
           <SignInButton forceRedirectUrl="/dashboard">
