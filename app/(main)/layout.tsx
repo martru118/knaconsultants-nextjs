@@ -26,7 +26,7 @@ function AppLayout({ children }: LayoutProps) {
 
   return (
     <>
-      {!isLoaded && <BarLoader width={"100%"} color="#36d7b7" />}
+      {!isLoaded && <BarLoader className="w-full" color="#36d7b7" />}
       <div className="flex flex-col h-screen bg-blue-50 md:flex-row">
         <aside className="hidden md:block w-64 bg-white">
           <nav className="mt-8">

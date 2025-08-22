@@ -22,7 +22,7 @@ async function Navbar() {
       </Link>
 
       <div className="flex items-center gap-4">
-        {/* Create events button (to be implemented)
+        {/* TODO: Create events button
         <Link href="/events?create=true">
           <Button className="flex items-center gap-2">
             <PenBox size={18} />
