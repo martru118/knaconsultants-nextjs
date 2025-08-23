@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
-import CreateEventDrawer from "@/components/CreateEventDrawer";
+import CreateEventDrawer from "@/components/events/CreateEventDrawer";
 
 export const metadata: Metadata = {
   title: "Schedulrr",
