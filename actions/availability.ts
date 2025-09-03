@@ -1,6 +1,6 @@
 "use server";
 
-import { daysOfWeek } from "@/app/(main)/availability/data";
+import { DAYS_OF_WEEK } from "@/app/(main)/availability/data";
 import db from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
@@ -25,7 +25,7 @@ export async function getUserAvailability() {
   };
 
   // assign availability by day of week
-  daysOfWeek.forEach((day) => {
+  DAYS_OF_WEEK.forEach((day) => {
     const daysAvailable = user.availability?.days.find(
       (d) => d.day === day.toUpperCase()
     );

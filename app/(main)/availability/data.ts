@@ -49,16 +49,6 @@ export const timeSlots = [
   "23:30",
 ];
 
-export const daysOfWeek = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-]
-
 // availability object schema
 export const defaultAvailability = {
   monday: { isAvailable: false, startTime: "09:00", endTime: "17:00" },
@@ -70,3 +60,5 @@ export const defaultAvailability = {
   sunday: { isAvailable: false, startTime: "09:00", endTime: "17:00" },
   timeGap: 0,
 };
+
+export const DAYS_OF_WEEK = Object.keys(defaultAvailability).slice(0, -1)
