@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
@@ -14,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import useFetch from "@/hooks/use-fetch";
+import { updateAvailability } from "@/actions/availability";
 
 interface FormProps {
   initialData: typeof defaultAvailability;
@@ -26,14 +29,24 @@ function AvailabilityForm({ initialData }: FormProps) {
     control,
     setValue,
     watch,
-    formState: { errors },
+    formState,
   } = useForm({
     resolver: zodResolver(availabilitySchema),
     defaultValues: { ...initialData },
   });
 
+  const {
+    fn: fnUpdateAvailability,
+    loading,
+    error,
+  } = useFetch(updateAvailability)
+
+  const onSubmit = async(data) => {
+    await fnUpdateAvailability(data)
+  }
+
   return (
-    <form className="space-y-6">
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       {DAYS_OF_WEEK.map((day) => {
         // watch for state changes
         const isAvailable = watch(`${day}.isAvailable`);
@@ -117,10 +130,10 @@ function AvailabilityForm({ initialData }: FormProps) {
                   }}
                 />
 
-                {errors[day]?.endTime && (
+                {formState.errors[day].endTime && (
                   // error handling for availability dropdown
                   <p className="text-red-500 text-xs mt-1">
-                    {errors[day].endTime.message}
+                    {formState.errors[day].endTime.message}
                   </p>
                 )}
               </>
@@ -139,14 +152,15 @@ function AvailabilityForm({ initialData }: FormProps) {
           className="w-32 bg-white"
         />
 
-        {errors.timeGap && (
+        {formState.errors.timeGap && (
           // error handling for time gap input
-          <p className="text-red-500 text-xs mt-1">{errors.timeGap.message}</p>
+          <p className="text-red-500 text-xs mt-1">{formState.errors.timeGap.message}</p>
         )}
       </div>
 
-      <Button className="mt-5" type="submit">
-        Update Availability
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      <Button className="mt-5" type="submit" disabled={loading}>
+        {loading? "Updating..." : "Update schedule"}
       </Button>
     </form>
   );

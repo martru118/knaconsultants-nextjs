@@ -1,6 +1,6 @@
 "use server";
 
-import { DAYS_OF_WEEK } from "@/app/(main)/availability/data";
+import { DAYS_OF_WEEK, defaultAvailability } from "@/app/(main)/availability/data";
 import db from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
@@ -43,4 +43,65 @@ export async function getUserAvailability() {
   });
 
   return availabilityData;
+}
+
+export async function updateAvailability(data: typeof defaultAvailability) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  // get availability of current user
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+    include: {
+      availability: true,
+    },
+  });
+  if (!user) throw new Error("User not found");
+
+  // transform the availability data into the format expected by the form
+  const availabilityData = Object.entries(data).flatMap(
+    ([day, { isAvailable, startTime, endTime }]: any) => {
+      if (isAvailable) {
+        const baseDate = new Date().toISOString().split("T")[0];
+        return [
+          {
+            day: day.toUpperCase(),
+            startTime: new Date(`${baseDate}T${startTime}:00Z`),
+            endTime: new Date(`${baseDate}T${endTime}:00Z`),
+          },
+        ];
+      }
+
+      return []
+    }
+  );
+
+  if (user.availability) {
+    // overwrite existing availability data
+    await db.availability.update({
+      where: {
+        id: user.availability.id,
+      },
+      data: {
+        timeGap: data.timeGap,
+        days: {
+          deleteMany: {},
+          create: availabilityData
+        }
+      }
+    })
+  } else {
+    // write new availability data
+    await db.availability.create({
+      data: {
+        userId: user.id,
+        timeGap: data.timeGap,
+        days: {
+          create: availabilityData
+        }
+      }
+    })
+  }
+
+  return { success: true }
 }
