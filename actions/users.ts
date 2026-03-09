@@ -1,5 +1,6 @@
 "use server";
 
+import { User } from "@/lib/generated/prisma";
 import db from "@/lib/prisma";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { success } from "zod";
@@ -31,4 +32,45 @@ export async function updateUsername(username: string) {
   return {
     success: true
   }
+}
+
+/* TODO: sync db with Clerk
+export async function getUserFromClerk(userId: string) {
+  // get user image
+  const client = await clerkClient()
+  const currentUser = await client.users.getUser(userId)
+  return currentUser
+}
+*/
+
+export async function getUserByUsername(username: string) {
+  const user = await db.user.findUnique({
+    where: {username},
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      imageUrl: true,
+      events: {
+        where: {
+          isPrivate: false
+        },
+        orderBy: {
+          createdAt: "desc"
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          duration: true,
+          isPrivate: true,
+          _count: {
+            select: {bookings: true}
+          }
+        }
+      }
+    }
+  })
+
+  return user
 }

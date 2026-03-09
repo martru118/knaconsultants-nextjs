@@ -7,9 +7,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import { deleteEvent } from "@/actions/events";
+import { Event } from "@/lib/generated/prisma";
 
 interface CardProps {
-  event: any,
+  event: Event,
   user: string,
   isPublic?: boolean,
 }
@@ -41,7 +42,6 @@ function EventCard({event, user, isPublic=false}: CardProps) {
   return (
     <Card
       className="flex flex-col justify-between cursor-pointer"
-      //onClick={handleCardClick}
     >
       <CardHeader>
         <CardTitle className="text-2xl">{event.title}</CardTitle>

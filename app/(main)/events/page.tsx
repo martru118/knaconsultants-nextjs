@@ -5,7 +5,7 @@ import { Suspense } from "react";
 function EventsPage() {
   return (
     <Suspense fallback={<div>Loading events...</div>}>
-
+      <Events />
     </Suspense>
   );
 }
@@ -25,4 +25,4 @@ async function Events() {
   }
 }
 
-export default Events;
+export default EventsPage;
