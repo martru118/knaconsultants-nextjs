@@ -1,6 +1,6 @@
 import { getUserByUsername } from "@/actions/users";
 import EventCard from "@/components/events/EventCard";
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -24,7 +24,7 @@ export async function generateMetadata({params}: UserPageProps): Promise<Metadat
   }
 }
 
-export default async function UserPage({params}: UserPageProps) {
+async function UserPage({params}: UserPageProps) {
   // retrieve username from url
   const {username} = await params
   const user = await getUserByUsername(username)
@@ -64,3 +64,5 @@ export default async function UserPage({params}: UserPageProps) {
     </div>
   );
 }
+
+export default UserPage
