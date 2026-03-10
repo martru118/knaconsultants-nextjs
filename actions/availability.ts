@@ -1,8 +1,12 @@
 "use server";
 
 import { DAYS_OF_WEEK, defaultAvailability } from "@/app/(main)/availability/data";
+import { Booking } from "@/lib/generated/prisma";
 import db from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { addDays, addMinutes, format, isBefore, parseISO, startOfDay } from "date-fns";
+
+const dateFormat = "yyyy-MM-dd"
 
 export async function getUserAvailability() {
   const { userId } = await auth();
@@ -66,8 +70,8 @@ export async function updateAvailability(data: typeof defaultAvailability) {
         return [
           {
             day: day.toUpperCase(),
-            startTime: new Date(`${baseDate}T${startTime}:00Z`),
-            endTime: new Date(`${baseDate}T${endTime}:00Z`),
+            startTime: new Date(`${baseDate}T${startTime}`),
+            endTime: new Date(`${baseDate}T${endTime}`),
           },
         ];
       }
@@ -104,4 +108,112 @@ export async function updateAvailability(data: typeof defaultAvailability) {
   }
 
   return { success: true }
+}
+
+export async function getEventAvailability(eventId: string) {
+  const event = await db.event.findUnique({
+    where: {
+      id: eventId,
+    },
+    include: {
+      user: {
+        include: {
+          // get user availability
+          availability: {
+            select: {
+              days: true,
+              timeGap: true,
+            }
+          },
+
+          // get already booked timeslots
+          bookings: {
+            select: {
+              startTime: true,
+              endTime: true,
+            }
+          }
+        }
+      }
+    }
+  })
+
+  // empty case
+  if (!event || !event.user.availability) return []
+
+  // create date limits for bookings
+  const {availability, bookings} = event.user
+  const startDate = startOfDay(new Date())
+  const endDate = addDays(startDate, 30)
+
+  // get available timeslots
+  const availableDates = []
+  for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
+    const dayOfWeek = format(date, "EEEE").toUpperCase()
+    const dayAvailability = availability.days.find((d) => d.day === dayOfWeek)
+
+    // find available timeslots
+    if (dayAvailability) {
+      const dateStr = format(date, dateFormat)
+      const slots = generateAvailableTimeslots(
+        dayAvailability.startTime,
+        dayAvailability.endTime,
+        event.duration,
+        bookings,
+        dateStr,
+        availability.timeGap
+      )
+
+      availableDates.push({
+        date: dateStr,
+        slots,
+      })
+    }
+  }
+
+  return availableDates
+}
+
+function generateAvailableTimeslots(
+  startTime: Date,
+  endTime: Date,
+  duration: number,
+  bookings: {
+    startTime: Date,
+    endTime: Date,
+  }[],
+  dateStr: string,
+  timeGap: number = 0
+) {
+  const slots = []
+  let currentTime = parseISO(`${dateStr}T${startTime.toISOString().slice(11, 16)}`)
+  const limitTime = parseISO(`${dateStr}T${endTime.toISOString().slice(11, 16)}`)
+
+  // exclude past timeslots
+  const now = new Date()
+  if (format(now, dateFormat) === dateStr) {
+    currentTime = isBefore(currentTime, now)? addMinutes(now, timeGap) : currentTime
+  }
+
+  while (currentTime < limitTime) {
+    const slotEnd = new Date(currentTime.getTime() + duration*60000)
+
+    // check if current slot is available
+    const isSlotAvailable = !bookings.some(booking => {
+      const bookingStart = booking.startTime
+      const bookingEnd = booking.endTime
+
+      return (
+        (currentTime >= bookingStart && currentTime < bookingEnd) ||  // current time falls in between booking start and end times
+        (slotEnd > bookingStart && slotEnd <= bookingEnd) ||          // slot end time falls in between booking times
+        (currentTime <= bookingStart && slotEnd >= bookingEnd)        // invalid time
+      )
+    })
+
+    // push all available timeslots
+    if (isSlotAvailable) slots.push(format(currentTime, "HH:mm"))
+    currentTime = slotEnd
+  }
+
+  return slots
 }

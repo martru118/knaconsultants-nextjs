@@ -1,6 +1,5 @@
 import { EventDetails } from "@/actions/event-details";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Event } from "@/lib/generated/prisma";
 import { Calendar, Clock } from "lucide-react";
 
 interface EventDetailsProps{
