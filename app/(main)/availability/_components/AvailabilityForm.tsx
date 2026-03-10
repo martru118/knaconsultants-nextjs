@@ -29,7 +29,7 @@ function AvailabilityForm({ initialData }: FormProps) {
     control,
     setValue,
     watch,
-    formState,
+    formState: {errors},
   } = useForm({
     resolver: zodResolver(availabilitySchema),
     defaultValues: { ...initialData },
@@ -38,7 +38,7 @@ function AvailabilityForm({ initialData }: FormProps) {
   const {
     fn: fnUpdateAvailability,
     loading,
-    error,
+    error: e,
   } = useFetch(updateAvailability)
 
   const onSubmit = async(data) => {
@@ -130,10 +130,10 @@ function AvailabilityForm({ initialData }: FormProps) {
                   }}
                 />
 
-                {formState.errors[day].endTime && (
+                {errors[day]?.endTime && (
                   // error handling for availability dropdown
                   <p className="text-red-500 text-xs mt-1">
-                    {formState.errors[day].endTime.message}
+                    {errors[day].endTime.message}
                   </p>
                 )}
               </>
@@ -142,8 +142,8 @@ function AvailabilityForm({ initialData }: FormProps) {
         );
       })}
 
-      <div>
-        <span>Minimum gap before bookings (mins.):</span>
+      <div className="flex items-center space-x-4">
+        <span className="w-48">Minimum gap before bookings (mins.):</span>
         <Input
           type="number"
           {...register("timeGap", {
@@ -152,13 +152,13 @@ function AvailabilityForm({ initialData }: FormProps) {
           className="w-32 bg-white"
         />
 
-        {formState.errors.timeGap && (
+        {errors.timeGap && (
           // error handling for time gap input
-          <p className="text-red-500 text-xs mt-1">{formState.errors.timeGap.message}</p>
+          <p className="text-red-500 text-xs mt-1">{errors.timeGap.message}</p>
         )}
       </div>
 
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {e && <p className="text-red-500 text-xs mt-1">{e}</p>}
       <Button className="mt-5" type="submit" disabled={loading}>
         {loading? "Updating..." : "Update schedule"}
       </Button>

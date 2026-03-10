@@ -53,3 +53,11 @@ export const availabilitySchema = z.object({
   sunday: daySchema,
   timeGap: z.number().min(0, "Time gap must be greater than 0 minutes").int(),
 });
+
+export const bookingSchema = z.object({
+  name: z.string().min(2, "Name is required"),
+  email: z.email("Invalid email"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+  time: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
+  additionalInfo: z.string().optional(),
+})
