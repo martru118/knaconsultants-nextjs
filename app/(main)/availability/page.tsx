@@ -1,7 +1,7 @@
 import { getUserAvailability } from "@/actions/availability";
 import { Suspense } from "react";
 import AvailabilityForm from "./_components/AvailabilityForm";
-import { defaultAvailability } from "./data";
+import { defaultAvailability } from "./constants";
 
 async function AvailabilityPage() {
   const availability: typeof defaultAvailability = await getUserAvailability()

@@ -1,22 +1,18 @@
 // @ts-nocheck
 "use client";
 
-import { Controller, useForm } from "react-hook-form";
-import { DAYS_OF_WEEK, defaultAvailability, timeSlots } from "../data";
+import { Controller, Form, useForm } from "react-hook-form";
+import { DAYS_OF_WEEK_IN_ORDER, defaultAvailability } from "../constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { availabilitySchema } from "@/lib/validators";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
 import { updateAvailability } from "@/actions/availability";
+import z from "zod";
+import { Plus } from "lucide-react";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 
 interface FormProps {
   initialData: typeof defaultAvailability;
@@ -30,10 +26,10 @@ function AvailabilityForm({ initialData }: FormProps) {
     setValue,
     watch,
     formState: {errors},
-  } = useForm({
+  } = useForm<z.infer<typeof availabilitySchema>>({
     resolver: zodResolver(availabilitySchema),
-    defaultValues: { ...initialData },
-  });
+    defaultValues: {...initialData},
+  })
 
   const {
     fn: fnUpdateAvailability,
@@ -41,107 +37,78 @@ function AvailabilityForm({ initialData }: FormProps) {
     error: e,
   } = useFetch(updateAvailability)
 
-  const onSubmit = async(data) => {
+  async function onSubmit(data: any) {
     await fnUpdateAvailability(data)
+  }
+
+  function renderDayInput(day: typeof availabilitySchema) {
+    const isAvailable = watch(`${day}.isAvailable`)
+
+    return (
+      <div key={day} className="flex items-center space-x-2 mb-4">
+        <Controller
+          name={`${day}.isAvailable`}
+          control={control}
+          render={({ field }) => {
+            return (
+              <Checkbox
+                className="border-2 bg-white"
+                checked={field.value}
+                onCheckedChange={(checked) => {
+                  setValue(`${day}.isAvailable`, checked);
+
+                  // set default times for unchecked days
+                  if (!checked) {
+                    setValue(`${day}.startTime`, "09:00")
+                    setValue(`${day}.endTime`, "17:00")
+                  }
+                }}
+              />
+            );
+          }}
+        />
+        <span className="capitalize font-semibold w-28">{day}</span>
+
+        {isAvailable && (
+          // availability time pickers
+          <div>
+            <FieldGroup className="flex-row w-32">
+              <Field>
+                <Input
+                  type="time"
+                  {...register(`${day}.startTime`)}
+                  className="w-32 bg-background"
+                />
+              </Field>
+              <span className="mt-1.5 -mx-4">to</span>
+              <Field>
+                <Input
+                  type="time"
+                  {...register(`${day}.endTime`)}
+                  className="w-32 bg-background"
+                />
+              </Field>
+            </FieldGroup>
+
+            {errors[day]?.endTime && (
+              <span className="text-destructive text-sm ml-2">
+                {errors[day].endTime.message}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-      {DAYS_OF_WEEK.map((day) => {
-        // watch for state changes
-        const isAvailable = watch(`${day}.isAvailable`);
-
-        return (
-          <div key={day} className="flex items-center space-x-4 mb-4">
-            <Controller
-              name={`${day}.isAvailable`}
-              control={control}
-              render={({ field }) => {
-                return (
-                  <Checkbox
-                    className="border-2 bg-white"
-                    checked={field.value}
-                    onCheckedChange={(checked) => {
-                      setValue(`${day}.isAvailable`, checked);
-
-                      // when not checked
-                      if (!checked) {
-                        setValue(`${day}.startTime`, "09:00");
-                        setValue(`${day}.endTime`, "17:00");
-                      }
-                    }}
-                  />
-                );
-              }}
-            />
-            <span className="capitalize w-24">{day}</span>
-
-            {isAvailable && (
-              <>
-                <Controller
-                  name={`${day}.startTime`}
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-32 bg-white">
-                          <SelectValue placeholder="Start time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timeSlots.map((time) => {
-                            return (
-                              <SelectItem key={time} value={time}>
-                                {time}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                    );
-                  }}
-                />
-                <span>to</span>
-                <Controller
-                  name={`${day}.endTime`}
-                  control={control}
-                  render={({ field }) => {
-                    return (
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-32 bg-white">
-                          <SelectValue placeholder="End time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timeSlots.map((time) => {
-                            return (
-                              <SelectItem key={time} value={time}>
-                                {time}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                    );
-                  }}
-                />
-
-                {errors[day]?.endTime && (
-                  // error handling for availability dropdown
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors[day].endTime.message}
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        );
-      })}
-
+      {DAYS_OF_WEEK_IN_ORDER.map(renderDayInput)}
+      <Button className="w-24 mt-4" type="submit" disabled={loading}>
+          {loading? "Saving..." : "Save"}
+      </Button>
+      
+      {/*
       <div className="flex items-center space-x-4">
         <span className="w-48">Minimum gap before bookings (mins.):</span>
         <Input
@@ -162,6 +129,7 @@ function AvailabilityForm({ initialData }: FormProps) {
       <Button className="mt-5" type="submit" disabled={loading}>
         {loading? "Updating..." : "Update schedule"}
       </Button>
+      */}
     </form>
   );
 }

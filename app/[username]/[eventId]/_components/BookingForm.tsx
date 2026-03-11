@@ -11,6 +11,9 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import z from "zod";
+
+const dateFormat = "yyyy-MM-dd"
 
 interface BookingFormProps {
   currentEvent: EventDetails,
@@ -30,20 +33,20 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
     setValue,
     watch,
     formState,
-  } = useForm({
+  } = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
   });
 
   // manually validate selected date and time 
   // can be replaced with controller component
   useEffect(() => {
-    if (selectedDate) setValue("date", format(selectedDate, "yyyy-MM-dd"))
+    if (selectedDate) setValue("date", format(selectedDate, dateFormat))
   }, [selectedDate, setValue])
   useEffect(() => {
     if (selectedTime) setValue("time", selectedTime)
   }, [selectedTime, setValue])
 
-  const onSubmit = async (data: any) => {
+  async function onSubmit(data: any) {
     console.log(data)
   }
 
@@ -53,12 +56,12 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   // fetch available time slots for particular day
   const timeSlots = selectedDate
     ? availability.find(
-      day => day.date === format(selectedDate, "yyyy-MM-dd")
+      day => day.date === format(selectedDate, dateFormat)
     )?.slots || []
   : []
 
   return (
-    <div className="flex flex-col gap-8 p-10 border bg-white">
+    <div className="flex flex-col p-10 border bg-white">
       <div className="md:h-96 flex flex-col md:flex-row gap-5">
         <div className="w-full">
           <DayPicker 
@@ -82,7 +85,7 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
             }}
           />
         </div>
-        <div className="w-full h-full md:overflow-scroll">
+        <div className="w-full h-full md:overflow-scroll no-scrollbar">
           {selectedDate && (
             <div className="mb-4">
               <h3 className="text-lg font-semibold mb-2">

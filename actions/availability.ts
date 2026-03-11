@@ -1,18 +1,26 @@
 "use server";
 
-import { DAYS_OF_WEEK, defaultAvailability } from "@/app/(main)/availability/data";
-import { Booking } from "@/lib/generated/prisma";
+import {
+  DAYS_OF_WEEK_IN_ORDER,
+  defaultAvailability,
+} from "@/app/(main)/availability/constants";
 import db from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { addDays, addMinutes, format, isBefore, parseISO, startOfDay } from "date-fns";
+import {
+  addDays,
+  addMinutes,
+  format,
+  isBefore,
+  parseISO,
+  startOfDay,
+} from "date-fns";
 
-const dateFormat = "yyyy-MM-dd"
+const dateFormat = "yyyy-MM-dd";
 
 export async function getUserAvailability() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  // get availability of current user
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
     include: {
@@ -29,7 +37,7 @@ export async function getUserAvailability() {
   };
 
   // assign availability by day of week
-  DAYS_OF_WEEK.forEach((day) => {
+  DAYS_OF_WEEK_IN_ORDER.forEach((day) => {
     const daysAvailable = user.availability?.days.find(
       (d) => d.day === day.toUpperCase()
     );
@@ -41,7 +49,7 @@ export async function getUserAvailability() {
         ? daysAvailable.startTime.toISOString().slice(11, 16)
         : "09:00",
       endTime: daysAvailable
-        ? daysAvailable.startTime.toISOString().slice(11, 16)
+        ? daysAvailable.endTime.toISOString().slice(11, 16)
         : "17:00",
     };
   });
@@ -90,10 +98,10 @@ export async function updateAvailability(data: typeof defaultAvailability) {
         timeGap: data.timeGap,
         days: {
           deleteMany: {},
-          create: availabilityData
-        }
-      }
-    })
+          create: availabilityData,
+        },
+      },
+    });
   } else {
     // write new availability data
     await db.availability.create({
@@ -101,13 +109,13 @@ export async function updateAvailability(data: typeof defaultAvailability) {
         userId: user.id,
         timeGap: data.timeGap,
         days: {
-          create: availabilityData
-        }
-      }
-    })
+          create: availabilityData,
+        },
+      },
+    });
   }
 
-  return { success: true }
+  return { success: true };
 }
 
 export async function getEventAvailability(eventId: string) {
@@ -123,7 +131,7 @@ export async function getEventAvailability(eventId: string) {
             select: {
               days: true,
               timeGap: true,
-            }
+            },
           },
 
           // get already booked timeslots
@@ -131,30 +139,30 @@ export async function getEventAvailability(eventId: string) {
             select: {
               startTime: true,
               endTime: true,
-            }
-          }
-        }
-      }
-    }
-  })
+            },
+          },
+        },
+      },
+    },
+  });
 
   // empty case
-  if (!event || !event.user.availability) return []
+  if (!event || !event.user.availability) return [];
 
   // create date limits for bookings
-  const {availability, bookings} = event.user
-  const startDate = startOfDay(new Date())
-  const endDate = addDays(startDate, 30)
+  const { availability, bookings } = event.user;
+  const startDate = startOfDay(new Date());
+  const endDate = addDays(startDate, 30);
 
   // get available timeslots
-  const availableDates = []
+  const availableDates = [];
   for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
-    const dayOfWeek = format(date, "EEEE").toUpperCase()
-    const dayAvailability = availability.days.find((d) => d.day === dayOfWeek)
+    const dayOfWeek = format(date, "EEEE").toUpperCase();
+    const dayAvailability = availability.days.find((d) => d.day === dayOfWeek);
 
     // find available timeslots
     if (dayAvailability) {
-      const dateStr = format(date, dateFormat)
+      const dateStr = format(date, dateFormat);
       const slots = generateAvailableTimeslots(
         dayAvailability.startTime,
         dayAvailability.endTime,
@@ -162,16 +170,16 @@ export async function getEventAvailability(eventId: string) {
         bookings,
         dateStr,
         availability.timeGap
-      )
+      );
 
       availableDates.push({
         date: dateStr,
         slots,
-      })
+      });
     }
   }
 
-  return availableDates
+  return availableDates;
 }
 
 function generateAvailableTimeslots(
@@ -179,41 +187,47 @@ function generateAvailableTimeslots(
   endTime: Date,
   duration: number,
   bookings: {
-    startTime: Date,
-    endTime: Date,
+    startTime: Date;
+    endTime: Date;
   }[],
   dateStr: string,
   timeGap: number = 0
 ) {
-  const slots = []
-  let currentTime = parseISO(`${dateStr}T${startTime.toISOString().slice(11, 16)}`)
-  const limitTime = parseISO(`${dateStr}T${endTime.toISOString().slice(11, 16)}`)
+  const slots = [];
+  let currentTime = parseISO(
+    `${dateStr}T${startTime.toISOString().slice(11, 16)}`
+  );
+  const limitTime = parseISO(
+    `${dateStr}T${endTime.toISOString().slice(11, 16)}`
+  );
 
   // exclude past timeslots
-  const now = new Date()
+  const now = new Date();
   if (format(now, dateFormat) === dateStr) {
-    currentTime = isBefore(currentTime, now)? addMinutes(now, timeGap) : currentTime
+    currentTime = isBefore(currentTime, now)
+      ? addMinutes(now, timeGap)
+      : currentTime;
   }
 
   while (currentTime < limitTime) {
-    const slotEnd = new Date(currentTime.getTime() + duration*60000)
+    const slotEnd = new Date(currentTime.getTime() + duration * 60000);
 
     // check if current slot is available
-    const isSlotAvailable = !bookings.some(booking => {
-      const bookingStart = booking.startTime
-      const bookingEnd = booking.endTime
+    const isSlotAvailable = !bookings.some((booking) => {
+      const bookingStart = booking.startTime;
+      const bookingEnd = booking.endTime;
 
       return (
-        (currentTime >= bookingStart && currentTime < bookingEnd) ||  // current time falls in between booking start and end times
-        (slotEnd > bookingStart && slotEnd <= bookingEnd) ||          // slot end time falls in between booking times
-        (currentTime <= bookingStart && slotEnd >= bookingEnd)        // invalid time
-      )
-    })
+        (currentTime >= bookingStart && currentTime < bookingEnd) || // current time falls in between booking start and end times
+        (slotEnd > bookingStart && slotEnd <= bookingEnd) || // slot end time falls in between booking times
+        (currentTime <= bookingStart && slotEnd >= bookingEnd) // invalid time
+      );
+    });
 
     // push all available timeslots
-    if (isSlotAvailable) slots.push(format(currentTime, "HH:mm"))
-    currentTime = slotEnd
+    if (isSlotAvailable) slots.push(format(currentTime, "HH:mm"));
+    currentTime = slotEnd;
   }
 
-  return slots
+  return slots;
 }

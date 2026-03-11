@@ -26,21 +26,16 @@ export const eventSchema = z.object({
 
 export const daySchema = z.object({
   isAvailable: z.boolean(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
+  startTime: z.iso.time(),
+  endTime: z.iso.time(),
 }).refine(
   (data) => {
-    if (data.isAvailable) {
-      // prevent end time underflow
-      return data.startTime! < data.endTime!;
-    }
-
-    return true;
+    return data.startTime < data.endTime;
   },
   {
-    error: "End time must be later than start time",
+    error: "Invalid time interval",
     path: ["endTime"],
-  }
+  },
 );
 
 export const availabilitySchema = z.object({
