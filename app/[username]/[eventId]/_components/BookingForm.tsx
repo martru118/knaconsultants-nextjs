@@ -24,15 +24,15 @@ interface BookingFormProps {
 }
 
 function BookingForm({currentEvent, availability}: BookingFormProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date())
-  const [selectedTime, setSelectedTime] = useState("")
+  const [selectedDate, setSelectedDate] = useState<Date>()
+  const [selectedTime, setSelectedTime] = useState<string>("")
   const {
     register,
     handleSubmit,
     control,
     setValue,
     watch,
-    formState,
+    formState: {errors},
   } = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
   });
@@ -51,7 +51,12 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   }
 
   // fetch available days
-  const availableDays = availability.map(day => new Date(day.date))
+  const availableDays = availability.map(day => {
+    // remove time zone string
+    const isoDate = new Date(day.date)
+    const dateOnly = new Date(isoDate.valueOf() + isoDate.getTimezoneOffset()*60*1000)
+    return dateOnly
+  })
 
   // fetch available time slots for particular day
   const timeSlots = selectedDate
@@ -61,11 +66,13 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   : []
 
   return (
-    <div className="flex flex-col p-10 border bg-white">
+    <div className="flex flex-col p-8 border bg-background">
       <div className="md:h-96 flex flex-col md:flex-row gap-5">
         <div className="w-full">
           <DayPicker 
             mode="single" 
+            animate
+            timeZone="America/Toronto"
             selected={selectedDate!} 
             onSelect={date => {
               setSelectedDate(date!)
@@ -95,7 +102,7 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
                 {timeSlots.map(slot => {
                   return <Button 
                     key={slot} 
-                    onClick={() => setSelectedTime(slot)}
+                    onClick={() => setSelectedTime(slot as string)}
                     variant={selectedTime === slot? "default" : "outline"}
                   >
                     {slot}
@@ -108,23 +115,31 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
       </div>
 
       {selectedTime && 
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-4 lg:-mt-8" onSubmit={handleSubmit(onSubmit)}>
           <div>
             <Input {...register("name")} placeholder="Your name" />
-            {formState.errors.name && (
-              <p className="text-red-500 text-sm">{formState.errors.name.message}</p>
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
             )}
           </div>
           <div>
             <Input {...register("email")} type="email" placeholder="Your email" />
-            {formState.errors.name && (
-              <p className="text-red-500 text-sm">{formState.errors.name.message}</p>
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
           </div>
           <div>
             <Textarea {...register("additionalInfo")} placeholder="Additional info" />
           </div>
-          <Button type="submit">Schedule event</Button>
+          <div className="flex flex-row">
+            <Button id="booking-submit" type="submit">Schedule event</Button>
+            {errors.date && (
+              <p className="text-destructive ml-2 mt-2">{errors.date.message}</p>
+            )}
+            {errors.time && (
+              <p className="text-destructive ml-2 mt-2">{errors.time.message}</p>
+            )}
+          </div>
         </form>
       }
     </div>

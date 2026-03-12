@@ -154,15 +154,16 @@ export async function getEventAvailability(eventId: string) {
   const startDate = startOfDay(new Date());
   const endDate = addDays(startDate, 30);
 
-  // get available timeslots
   const availableDates = [];
   for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
+    // find availability by weekday
     const dayOfWeek = format(date, "EEEE").toUpperCase();
     const dayAvailability = availability.days.find((d) => d.day === dayOfWeek);
 
     // find available timeslots
     if (dayAvailability) {
       const dateStr = format(date, dateFormat);
+      
       const slots = generateAvailableTimeslots(
         dayAvailability.startTime,
         dayAvailability.endTime,
@@ -194,23 +195,23 @@ function generateAvailableTimeslots(
   timeGap: number = 0
 ) {
   const slots = [];
-  let currentTime = parseISO(
+  let firstTime = parseISO(
     `${dateStr}T${startTime.toISOString().slice(11, 16)}`
   );
-  const limitTime = parseISO(
+  const secondTime = parseISO(
     `${dateStr}T${endTime.toISOString().slice(11, 16)}`
   );
 
   // exclude past timeslots
   const now = new Date();
   if (format(now, dateFormat) === dateStr) {
-    currentTime = isBefore(currentTime, now)
+    firstTime = isBefore(firstTime, now)
       ? addMinutes(now, timeGap)
-      : currentTime;
+      : firstTime;
   }
 
-  while (currentTime < limitTime) {
-    const slotEnd = new Date(currentTime.getTime() + duration * 60000);
+  while (firstTime < secondTime) {
+    const slotEnd = new Date(firstTime.getTime() + duration * 60000);
 
     // check if current slot is available
     const isSlotAvailable = !bookings.some((booking) => {
@@ -218,15 +219,15 @@ function generateAvailableTimeslots(
       const bookingEnd = booking.endTime;
 
       return (
-        (currentTime >= bookingStart && currentTime < bookingEnd) || // current time falls in between booking start and end times
+        (firstTime >= bookingStart && firstTime < bookingEnd) || // current time falls in between booking start and end times
         (slotEnd > bookingStart && slotEnd <= bookingEnd) || // slot end time falls in between booking times
-        (currentTime <= bookingStart && slotEnd >= bookingEnd) // invalid time
+        (firstTime <= bookingStart && slotEnd >= bookingEnd) // invalid time
       );
     });
 
     // push all available timeslots
-    if (isSlotAvailable) slots.push(format(currentTime, "HH:mm"));
-    currentTime = slotEnd;
+    if (isSlotAvailable) slots.push(format(firstTime, "p"));
+    firstTime = slotEnd;
   }
 
   return slots;
