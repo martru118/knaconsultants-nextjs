@@ -1,7 +1,7 @@
 "use server"
 
-import { Event } from "@/lib/generated/prisma";
-import db from "@/lib/prisma";
+import { Event } from "@/lib/generated/prisma/client";
+import { db } from "@/lib/prisma";
 import { eventSchema } from "@/lib/validators";
 import { auth } from "@clerk/nextjs/server";
 

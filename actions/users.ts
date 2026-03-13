@@ -1,7 +1,7 @@
 "use server";
 
-import { User } from "@/lib/generated/prisma";
-import db from "@/lib/prisma";
+import { User } from "@/lib/generated/prisma/client";
+import { db } from "@/lib/prisma";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { success } from "zod";
 

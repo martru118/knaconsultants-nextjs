@@ -1,13 +1,10 @@
-import { PrismaClient } from "./generated/prisma";
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "./generated/prisma/client";
 
-const globalWithPrisma = global as typeof globalThis & { prisma: PrismaClient };
+const connectionString = `${process.env.DATABASE_URL}`;
 
-if (process.env.NODE_ENV !== 'production' && !globalWithPrisma.prisma) {
-  globalWithPrisma.prisma = new PrismaClient();
-}
+const adapter = new PrismaPg({ connectionString });
+const db = new PrismaClient({ adapter });
 
-const db = process.env.NODE_ENV === 'production' ? new PrismaClient() : globalWithPrisma.prisma;
-export default db;
-
-// globalWithPrisma.prisma: This global variable ensures that the Prisma client instance is reused across hot reloads during development. 
-// Without this, each time your application reloads, a new instance of the Prisma client would be created, potentially leading to connection issues.
+export { db };

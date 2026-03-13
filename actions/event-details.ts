@@ -1,7 +1,7 @@
 "use server"
 
-import { Prisma } from "@/lib/generated/prisma";
-import db from "@/lib/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
+import { db } from "@/lib/prisma";
 
 export type EventDetails = Prisma.EventGetPayload<{
   include: {

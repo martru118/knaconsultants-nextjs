@@ -1,7 +1,6 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { Item } from "@radix-ui/react-select";
 import { BarChart, Calendar, Clock, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

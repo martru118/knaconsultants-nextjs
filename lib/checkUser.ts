@@ -1,5 +1,5 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import db from "./prisma";
+import { db } from "./prisma";
 
 export async function checkUser() {
   const user = await currentUser()
@@ -31,6 +31,8 @@ export async function checkUser() {
         username: slug,
       }
     })
+
+    return newUser
   } catch (error) {
     console.error(error)
   }

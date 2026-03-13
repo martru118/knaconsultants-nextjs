@@ -4,7 +4,7 @@ import {
   DAYS_OF_WEEK_IN_ORDER,
   defaultAvailability,
 } from "@/app/(main)/availability/constants";
-import db from "@/lib/prisma";
+import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import {
   addDays,

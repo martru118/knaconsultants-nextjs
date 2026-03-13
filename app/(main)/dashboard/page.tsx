@@ -11,6 +11,7 @@ import React, { useEffect } from "react";
 import useFetch from "@/hooks/use-fetch";
 import { updateUsername } from "@/actions/users";
 import { BarLoader } from "react-spinners";
+import z from "zod";
 
 function Dashboard() {
   const { isLoaded, user } = useUser();
@@ -21,7 +22,7 @@ function Dashboard() {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm<z.infer<typeof usernameSchema>>({
     resolver: zodResolver(usernameSchema),
   });
 
@@ -33,7 +34,7 @@ function Dashboard() {
   // update username to db
   const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername);
 
-  const onSubmitForm = async (data: any) => {
+  async function onSubmitForm(data: { username: string }) {
     fnUpdateUsername(data.username);
   };
 
