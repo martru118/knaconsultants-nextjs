@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
 import { updateAvailability } from "@/actions/availability";
 import z from "zod";
-import { Plus } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { DayAvailability } from "@/lib/generated/prisma/client";
 
 interface FormProps {
   initialData: typeof defaultAvailability;
@@ -37,7 +37,7 @@ function AvailabilityForm({ initialData }: FormProps) {
     error: e,
   } = useFetch(updateAvailability)
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: DayAvailability) {
     await fnUpdateAvailability(data)
   }
 
@@ -52,7 +52,7 @@ function AvailabilityForm({ initialData }: FormProps) {
           render={({ field }) => {
             return (
               <Checkbox
-                className="border-2 bg-white"
+                className="border-2 bg-white outline-black"
                 checked={field.value}
                 onCheckedChange={(checked) => {
                   setValue(`${day}.isAvailable`, checked);
@@ -104,12 +104,8 @@ function AvailabilityForm({ initialData }: FormProps) {
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       {DAYS_OF_WEEK_IN_ORDER.map(renderDayInput)}
-      <Button className="w-24 mt-4" type="submit" disabled={loading}>
-          {loading? "Saving..." : "Save"}
-      </Button>
       
-      {/*
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 mt-5">
         <span className="w-48">Minimum gap before bookings (mins.):</span>
         <Input
           type="number"
@@ -126,10 +122,9 @@ function AvailabilityForm({ initialData }: FormProps) {
       </div>
 
       {e && <p className="text-red-500 text-xs mt-1">{e}</p>}
-      <Button className="mt-5" type="submit" disabled={loading}>
-        {loading? "Updating..." : "Update schedule"}
+      <Button type="submit" disabled={loading}>
+        {loading? "Saving..." : "Save schedule"}
       </Button>
-      */}
     </form>
   );
 }

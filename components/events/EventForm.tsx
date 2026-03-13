@@ -43,12 +43,16 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
     },
   });
 
-  const { loading, error, fn: fnCreateEvent } = useFetch(createEvent);
+  const { 
+    loading, 
+    error: e, 
+    fn: fnCreateEvent 
+  } = useFetch(createEvent);
 
   // handle submit state
   const onSubmit = async (data: any) => {
     await fnCreateEvent(data);
-    if (!loading && !error) onSubmitForm();
+    if (!loading && !e) onSubmitForm();
     router.refresh(); // refresh the page to show updated data
   };
 
@@ -128,7 +132,7 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
               onValueChange={(value) => field.onChange(value === "true")}
               value={field.value ? "true" : "false"}
             >
-              <SelectTrigger className="block mt-1">
+              <SelectTrigger className="block w-full mt-1">
                 <SelectValue placeholder="Private" />
               </SelectTrigger>
               <SelectContent>

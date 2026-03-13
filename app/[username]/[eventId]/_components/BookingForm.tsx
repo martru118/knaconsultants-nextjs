@@ -12,6 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import z from "zod";
+import { createBooking } from "@/actions/bookings";
+import useFetch from "@/hooks/use-fetch";
+import { Booking } from "@/lib/generated/prisma/client";
 
 const dateFormat = "yyyy-MM-dd"
 
@@ -46,9 +49,58 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
     if (selectedTime) setValue("time", selectedTime)
   }, [selectedTime, setValue])
 
+  // send booking to Google Calendar
+  const {loading, data, fn: fnCreateBooking} = useFetch(createBooking)
+
   async function onSubmit(data: any) {
-    console.log(data)
+    //console.log(data)
+    if (!selectedDate || !selectedTime) {
+      console.error("Date or time not selected")
+      return
+    }
+
+    // format start and end times
+    const startTime = new Date(
+      `${format(selectedDate, dateFormat)}T${selectedTime}`
+    )
+    const endTime = new Date(startTime.getTime() + currentEvent.duration*60000)
+
+    // prepare booking data object
+    const bookingData = {
+      eventId: currentEvent.id,
+      name: data.name,
+      email: data.email,
+      startTime,
+      endTime,
+      additionalInfo: data.additionalInfo,
+    }
+
+    //await fnCreateBooking(bookingData)
   }
+
+  /*
+  // success state
+  if (data) {
+    return (
+      <div className="text-center p-10 border bg-white">
+        <h2 className="text-2xl font-bold mb-4">Booking successful!</h2>
+        {data.meetLink && (
+          <p>
+            Join the meeting:{" "}
+            <a
+              href={data.meetLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              {data.meetLink}
+            </a>
+          </p>
+        )}
+      </div>
+    );
+  }
+  */
 
   // fetch available days
   const availableDays = availability.map(day => {
@@ -132,7 +184,9 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
             <Textarea {...register("additionalInfo")} placeholder="Additional info" />
           </div>
           <div className="flex flex-row">
-            <Button id="booking-submit" type="submit">Schedule event</Button>
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Scheduling..." : "Schedule Event"}
+            </Button>
             {errors.date && (
               <p className="text-destructive ml-2 mt-2">{errors.date.message}</p>
             )}

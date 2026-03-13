@@ -57,7 +57,7 @@ function Dashboard() {
           <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
             <div>
               <div className="flex items-center gap-2">
-                <span>{window?.location.origin}/</span>
+                <span>localhost:3000/</span>
                 <Input {...register("username")} placeholder="username" />
               </div>
 
