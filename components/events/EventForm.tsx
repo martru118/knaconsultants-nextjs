@@ -1,4 +1,3 @@
-import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,9 @@ import { eventSchema } from "@/lib/validators";
 import { createEvent } from "@/actions/events";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
+import z from "zod";
+import { Field, FieldGroup, FieldLabel } from "../ui/field";
+import { Switch } from "../ui/switch";
 
 interface FormProps {
   onSubmitForm: any,
@@ -32,14 +34,15 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
     register,
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       title: initialData?.title || "",
       description: initialData?.description || "",
       duration: initialData?.duration || 30,
-      isPrivate: initialData?.isPrivate ?? true,
+      isPrivate: initialData?.isPrivate ?? false,
     },
   });
 
@@ -50,7 +53,7 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
   } = useFetch(createEvent);
 
   // handle submit state
-  const onSubmit = async (data: any) => {
+  async function onSubmit(data: z.infer<typeof eventSchema>) {
     await fnCreateEvent(data);
     if (!loading && !e) onSubmitForm();
     router.refresh(); // refresh the page to show updated data
@@ -61,93 +64,66 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
       className="px-6 flex flex-col gap-4"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div>
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Title
-        </label>
+      <FieldGroup>
+        <div className="grid grid-cols-2 gap-2">
+          <Field>
+            <FieldLabel htmlFor="event-title">Title</FieldLabel>
+            <Input id="event-title" {...register("title")} className="-mt-2" />
+            {errors.title && (
+              <p className="text-red-500 text-xs -mt-1">{errors.title.message}</p>
+            )}
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="event-duration">Duration in minutes</FieldLabel>
+            <Input
+              id="event-duration"
+              {...register("duration", {
+                valueAsNumber: true,
+              })}
+              type="number"
+              className="-mt-2"
+            />
+            {errors.duration && (
+              <p className="text-red-500 text-xs -mt-1">{errors.duration.message}</p>
+            )}
+          </Field>
+        </div>
 
-        <Input id="title" {...register("title")} className="mt-1" />
-        {errors.title && (
-          <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Event description
-        </label>
-
-        <Textarea
-          {...register("description")}
-          id="description"
-          className="mt-1"
-        />
-        {errors.description && (
-          <p className="text-red-500 text-xs mt-1">
-            {errors.description.message}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="duration"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Duration (minutes)
-        </label>
-
-        <Input
-          id="duration"
-          {...register("duration", {
-            valueAsNumber: true,
-          })}
-          type="number"
-          className="mt-1"
-        />
-        {errors.duration && (
-          <p className="text-red-500 text-xs mt-1">{errors.duration.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="isPrivate"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Private event
-        </label>
-
-        <Controller
-          name="isPrivate"
-          control={control}
-          render={({ field }) => (
-            <Select
-              onValueChange={(value) => field.onChange(value === "true")}
-              value={field.value ? "true" : "false"}
-            >
-              <SelectTrigger className="block w-full mt-1">
-                <SelectValue placeholder="Private" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Private</SelectItem>
-                <SelectItem value="false">Public</SelectItem>
-              </SelectContent>
-            </Select>
+        <Field className="-mt-2">
+          <FieldLabel htmlFor="event-description">Description</FieldLabel>
+          <Textarea
+            {...register("description")}
+            id="description"
+            className="-mt-2"
+          />
+          {errors.description && (
+            <p className="text-red-500 text-xs -mt-1">
+              {errors.description.message}
+            </p>
           )}
-        />
-      </div>
-      {errors && <p className="text-red-500 text-xs mt-1">{errors.root?.message}</p>}
+        </Field>
 
-      <Button type="submit" disabled={loading}>
-        {loading ? "Submitting..." : "Create Event"}
-      </Button>
+        <Field orientation="horizontal">
+          <Controller
+            name="isPrivate"
+            control={control}
+            render={({ field }) =>
+              <Switch id="event-isprivate" 
+                checked={field.value}
+                onCheckedChange={(checked) => {
+                  setValue("isPrivate", checked)
+                }}
+              />
+            }
+          />
+          <FieldLabel htmlFor="event-isprivate" className="text-md">Private</FieldLabel>
+
+          <Button type="submit" disabled={loading}>
+            {loading ? "Submitting..." : "Create Event"}
+          </Button>
+        </Field>
+        {errors && <p className="text-red-500 text-xs mt-1">{errors.root?.message}</p>}
+      </FieldGroup>
     </form>
   );
 };

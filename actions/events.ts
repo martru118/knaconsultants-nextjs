@@ -4,6 +4,7 @@ import { Event } from "@/lib/generated/prisma/client";
 import { db } from "@/lib/prisma";
 import { eventSchema } from "@/lib/validators";
 import { auth } from "@clerk/nextjs/server";
+import { cache } from "react";
 
 export async function createEvent(data: Event) {
   const { userId } = await auth();
@@ -28,7 +29,7 @@ export async function createEvent(data: Event) {
   return event
 }
 
-export async function getUserEvents() {
+async function getUserEvents() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -54,6 +55,8 @@ export async function getUserEvents() {
     username: user.username,
   }
 }
+
+export const getCachedUserEvents = cache(getUserEvents)
 
 export async function deleteEvent(eventId: string) {
   const { userId } = await auth();

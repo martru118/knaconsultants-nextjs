@@ -1,4 +1,4 @@
-import { getUserEvents } from "@/actions/events";
+import { getCachedUserEvents } from "@/actions/events";
 import EventCard from "@/components/events/EventCard";
 import { Suspense } from "react";
 
@@ -11,7 +11,7 @@ function EventsPage() {
 }
 
 async function Events() {
-  const {event, username} = await getUserEvents()
+  const {event, username} = await getCachedUserEvents()
 
   if (event.length === 0) {
     return <p>You haven&apos;t created any events yet.</p>

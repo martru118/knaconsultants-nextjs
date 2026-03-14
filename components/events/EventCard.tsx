@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import { deleteEvent } from "@/actions/events";
-import { Event } from "@/lib/generated/prisma";
+import { Event } from "@/lib/generated/prisma/client";
 
 interface CardProps {
   event: Event,
