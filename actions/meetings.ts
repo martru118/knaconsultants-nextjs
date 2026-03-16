@@ -3,6 +3,7 @@
 import { Prisma } from "@/lib/generated/prisma/client";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { cache } from "react";
 
 export type UserMeetings = Prisma.BookingGetPayload<{
   include: {
@@ -55,7 +56,7 @@ export async function getUserMeetings(filter: string) {
   return meetings
 }
 
-export async function getLatestUpdates() {
+async function getLatestMeetings() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -84,3 +85,5 @@ export async function getLatestUpdates() {
 
   return upcomingMeetings
 }
+
+export const cachedLatestMeetings = cache(getLatestMeetings)

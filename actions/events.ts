@@ -56,7 +56,7 @@ async function getUserEvents() {
   }
 }
 
-export const getCachedUserEvents = cache(getUserEvents)
+export const cachedUserEvents = cache(getUserEvents)
 
 export async function deleteEvent(eventId: string) {
   const { userId } = await auth();

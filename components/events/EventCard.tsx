@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import { deleteEvent } from "@/actions/events";
 import { Event } from "@/lib/generated/prisma/client";
+import { revalidatePath } from "next/cache";
 
 interface CardProps {
   event: Event,
@@ -35,7 +36,7 @@ function EventCard({event, user, isPublic=false}: CardProps) {
   const handleDelete = async() => {
     if (window?.confirm("Are you sure you want to delete this event?")) {
       await fnDeleteEvent(event.id)
-      router.refresh()
+      revalidatePath("/events")
     }
   }
 
@@ -61,7 +62,7 @@ function EventCard({event, user, isPublic=false}: CardProps) {
           <Button
             variant="outline"
             onClick={handleCopy}
-            className="flex items-center"
+            disabled={loading}
           >
             <Link className="mr-2 h-4 w-4" />
             {isCopied? "Copied!" : "Copy Link"}

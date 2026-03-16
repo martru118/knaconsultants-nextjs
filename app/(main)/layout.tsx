@@ -25,9 +25,9 @@ function AppLayout({ children }: LayoutProps) {
 
   return (
     <>
-      {!isLoaded && <BarLoader className="w-full" color="#36d7b7" />}
-      <div className="flex flex-col h-screen bg-blue-50 md:flex-row">
-        <aside className="hidden md:block w-64 bg-white">
+      {!isLoaded && <BarLoader className="min-w-screen" color="#36d7b7" />}
+      <div className="flex flex-col min-h-screen bg-blue-50 md:flex-row">
+        <aside className="hidden md:block w-64 bg-background">
           <nav className="mt-8">
             <ul>
               {navOptions.map((option) => (
@@ -50,15 +50,14 @@ function AppLayout({ children }: LayoutProps) {
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <header className="flex justify-between items-center mb-4">
             <h2 className="text-5xl md:text-6xl gradient-title pt-2 md:pt-0 text-center md:text-left">
-              {navOptions.find((option) => option.href === pathname)?.label ||
-                "Dashboard"}
+              {navOptions.find((option) => option.href === pathname)?.label}
             </h2>
           </header>
           {children}
         </main>
       </div>
 
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background shadow-md">
         <ul className="flex justify-around">
           {navOptions.map((option) => (
             <li key={option.href}>

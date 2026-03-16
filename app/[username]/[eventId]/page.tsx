@@ -1,10 +1,10 @@
-import { getEventDetails } from "@/actions/event-details";
+import { cachedEventDetails } from "@/actions/event-details";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import EventDetailsCard from "./_components/EventDetails";
+import EventDetailsCard from "./_components/event-details";
 import { Suspense } from "react";
-import BookingForm from "./_components/BookingForm";
-import { getEventAvailability } from "@/actions/availability";
+import BookingForm from "./_components/booking-form";
+import { cachedEventAvailability } from "@/actions/availability";
 
 interface EventPageProps {
   params: Promise<{username: string, eventId: string}>
@@ -12,7 +12,7 @@ interface EventPageProps {
 
 export async function generateMetadata({params}: EventPageProps): Promise<Metadata> {
   const {username, eventId} = await params
-  const event = await getEventDetails(username, eventId)
+  const event = await cachedEventDetails(username, eventId)
 
   if (!event) return {
     title: "Event not found"
@@ -27,14 +27,14 @@ export async function generateMetadata({params}: EventPageProps): Promise<Metada
 
 async function EventBookingPage({params}: EventPageProps) {
   const {username, eventId} = await params
-  const eventDetails = await getEventDetails(username, eventId)
+  const eventDetails = await cachedEventDetails(username, eventId)
   if (!eventDetails) return notFound()
 
   // get available timeslots for this event
-  const availabilities = await getEventAvailability(eventId)
+  const availabilities = await cachedEventAvailability(eventId)
 
   return (
-    <div className="flex flex-col justify-center lg:flex-row px-4 py-8">
+    <div className="max-w-[90-vw] flex flex-col justify-center lg:flex-row px-4 py-8">
       <EventDetailsCard event={eventDetails} />
 
       <Suspense fallback={<div>Loading booking form...</div>}>

@@ -14,7 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import z from "zod";
 import { createBooking } from "@/actions/bookings";
 import useFetch from "@/hooks/use-fetch";
-import { Booking } from "@/lib/generated/prisma/client";
+import { Spinner } from "@/components/ui/spinner";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 
 const dateFormat = "yyyy-MM-dd"
 
@@ -32,16 +33,13 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   const {
     register,
     handleSubmit,
-    control,
     setValue,
-    watch,
     formState: {errors},
   } = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
   });
 
   // manually validate selected date and time 
-  // can be replaced with controller component
   useEffect(() => {
     if (selectedDate) setValue("date", format(selectedDate, dateFormat))
   }, [selectedDate, setValue])
@@ -52,8 +50,9 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   // send booking to Google Calendar
   const {loading, data, fn: fnCreateBooking} = useFetch(createBooking)
 
-  async function onSubmit(data: any) {
-    //console.log(data)
+  async function onSubmit(data: z.infer<typeof bookingSchema>) {
+    console.log(data)
+    /*
     if (!selectedDate || !selectedTime) {
       console.error("Date or time not selected")
       return
@@ -75,7 +74,8 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
       additionalInfo: data.additionalInfo,
     }
 
-    //await fnCreateBooking(bookingData)
+    await fnCreateBooking(bookingData)
+    */
   }
 
   /*
@@ -118,12 +118,13 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   : []
 
   return (
-    <div className="flex flex-col p-8 border bg-background">
+    <div className="flex flex-col p-8 border bg-background lg:w-2/3">
       <div className="md:h-96 flex flex-col md:flex-row gap-5">
-        <div className="w-full">
+        <div className="max-w-full">
           <DayPicker 
             mode="single" 
             animate
+            required
             timeZone="America/Toronto"
             selected={selectedDate!} 
             onSelect={date => {
@@ -144,48 +145,77 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
             }}
           />
         </div>
-        <div className="w-full h-full md:overflow-scroll no-scrollbar">
-          {selectedDate && (
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2">
-                Available time slots
-              </h3>
+        <div className="max-w-full h-full mt-2 md:overflow-scroll no-scrollbar">
+          <div className="mb-5">
+            <h3 className="text-lg font-semibold mb-2">
+              Available time slots
+            </h3>
+            {!timeSlots.length && (
+              <p className="text-md">No time slots available.</p>
+            )}
+            {selectedDate && (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                 {timeSlots.map(slot => {
                   return <Button 
                     key={slot} 
-                    onClick={() => setSelectedTime(slot as string)}
+                    onClick={() => setSelectedTime(slot)}
                     variant={selectedTime === slot? "default" : "outline"}
                   >
                     {slot}
                   </Button>
                 })}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
-      {selectedTime && 
-        <form className="space-y-4 lg:-mt-8" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <Input {...register("name")} placeholder="Your name" />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
-            )}
-          </div>
-          <div>
-            <Input {...register("email")} type="email" placeholder="Your email" />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-          <div>
-            <Textarea {...register("additionalInfo")} placeholder="Additional info" />
-          </div>
+      {selectedTime && // display booking form when time is selected
+        <form className="max-w-full space-y-4 md:-mt-8" onSubmit={handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="attendee-name">
+                Name <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input id="attendee-name"
+                {...register("name")} 
+                placeholder="Your name" 
+                required
+                className="-mt-2"
+              />
+
+            </Field>
+            <Field className="-mt-4">
+              <FieldLabel htmlFor="attendee-email">
+                Email <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input id="attendee-email"
+                {...register("email")} 
+                type="email" 
+                placeholder="Your email"
+                required
+                className="-mt-2"
+              />
+
+            </Field>
+          </FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="booking-info">Additional info</FieldLabel>
+            <Textarea id="booking-info"
+              {...register("additionalInfo")} 
+              placeholder="What would you like to discuss?" 
+              className="-mt-2 overflow-y-auto"
+            />
+          </Field>
+
           <div className="flex flex-row">
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Scheduling..." : "Schedule Event"}
+            <Button 
+              type="submit"
+              disabled={loading}
+              className="w-full"
+            >
+              {loading? <Spinner data-icon="inline-start" /> : null}
+              Schedule event
             </Button>
             {errors.date && (
               <p className="text-destructive ml-2 mt-2">{errors.date.message}</p>

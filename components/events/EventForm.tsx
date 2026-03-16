@@ -17,9 +17,10 @@ import useFetch from "@/hooks/use-fetch";
 import z from "zod";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Switch } from "../ui/switch";
+import { Spinner } from "../ui/spinner";
 
 interface FormProps {
-  onSubmitForm: any,
+  onSubmitForm: () => Promise<void>,
   initialData?: {
     title: string,
     description: string,
@@ -119,10 +120,11 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
           <FieldLabel htmlFor="event-isprivate" className="text-md">Private</FieldLabel>
 
           <Button type="submit" disabled={loading}>
-            {loading ? "Submitting..." : "Create Event"}
+            {loading? <Spinner data-icon="inline-start" /> : null}
+            Save
           </Button>
         </Field>
-        {errors && <p className="text-red-500 text-xs mt-1">{errors.root?.message}</p>}
+        {errors && <p className="text-destructive text-xs mt-1">{errors.root?.message}</p>}
       </FieldGroup>
     </form>
   );

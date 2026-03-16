@@ -12,7 +12,6 @@ import useFetch from "@/hooks/use-fetch";
 import { updateAvailability } from "@/actions/availability";
 import z from "zod";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { DayAvailability } from "@/lib/generated/prisma/client";
 
 interface FormProps {
   initialData: typeof defaultAvailability;
@@ -37,7 +36,7 @@ function AvailabilityForm({ initialData }: FormProps) {
     error: e,
   } = useFetch(updateAvailability)
 
-  async function onSubmit(data: DayAvailability) {
+  async function onSubmit(data: z.infer<typeof availabilitySchema>) {
     await fnUpdateAvailability(data)
   }
 
@@ -123,7 +122,8 @@ function AvailabilityForm({ initialData }: FormProps) {
 
       {e && <p className="text-red-500 text-xs mt-1">{e}</p>}
       <Button type="submit" disabled={loading}>
-        {loading? "Saving..." : "Save schedule"}
+        {loading? <Spinner data-icon="inline-start" /> : null}
+        Update schedule
       </Button>
     </form>
   );
