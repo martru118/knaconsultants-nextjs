@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { PenBox } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import UserMenu from "./UserMenu";
-import { checkUser } from "@/lib/checkUser";
+import { checkUser } from "@/lib/check-user";
+import CreateEventButton from "./events/CreateEventButton";
 
 async function Navbar() {
   await checkUser()
@@ -28,13 +28,7 @@ async function Navbar() {
           </SignInButton>
         </SignedOut>
         <SignedIn>
-          <Link href="/events?create=true">
-            <Button className="flex items-center gap-2">
-              <PenBox size={18} />
-              Create Event
-            </Button>
-          </Link>
-
+          <CreateEventButton />
           <UserMenu />
         </SignedIn>
       </div>

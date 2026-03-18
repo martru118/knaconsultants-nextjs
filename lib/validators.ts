@@ -12,6 +12,7 @@ export const usernameSchema = z.object({
 });
 
 export const eventSchema = z.object({
+  id: z.string(),
   title: z
     .string()
     .min(1, "Title is required")
@@ -54,5 +55,5 @@ export const bookingSchema = z.object({
   email: z.email("Invalid email"),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
   time: z.string().regex(/^\b((1[0-2]|0?[1-9]):([0-5][0-9]) ([AaPp][Mm]))$/, "Invalid time format"),
-  additionalInfo: z.string().optional(),
+  additionalInfo: z.string().max(500, "Must be 500 characters or less").optional(),
 })

@@ -1,19 +1,19 @@
-import { cachedUserEvents } from "@/actions/events";
+import { cachedDashboardEvents } from "@/actions/events";
 import EventCard from "@/components/events/EventCard";
 import { Suspense } from "react";
 
 function EventsDashboard() {
   return (
     <Suspense fallback={<div>Loading events...</div>}>
-      <Events />
+      <EventsPage />
     </Suspense>
   );
 }
 
-async function Events() {
-  const {event, username} = await cachedUserEvents()
+async function EventsPage() {
+  const {event, username} = await cachedDashboardEvents()
 
-  if (event.length === 0) {
+  if (!event.length) {
     return <p>You haven&apos;t created any events yet.</p>
   } else {
     return <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">

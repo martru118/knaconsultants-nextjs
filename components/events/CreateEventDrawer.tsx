@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import {
   Drawer,
   DrawerContent,
@@ -9,41 +7,22 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import EventForm from "./EventForm";
+import { useDrawer } from "@/hooks/use-drawer";
 
 export default function CreateEventDrawer() {
-  const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // create event on param trigger
-  useEffect(() => {
-    const create = searchParams.get("create");
-    if (create === "true") setIsOpen(true);
-  }, [searchParams]);
-
-  {/* State can be exposed to our app in case we want to manually open the drawer 👇
-    useEffect(() => {
-      window.openCreateEventDrawer = () => setIsOpen(true);
-      return () => {delete window.openCreateEventDrawer};
-    }, []);
-  */}
-
-  // remove params and close drawer
-  function handleClose() {
-    setIsOpen(false);
-    if (searchParams.get("create") === "true") {
-      router.replace(window?.location.pathname);
-    }
-  };
+  // expose global drawer state
+  const data = useDrawer(state => state.initialData)
+  const isOpen = useDrawer(state => state.isOpen)
+  const closeDrawer = useDrawer(state => state.closeDrawer)
 
   return (
-    <Drawer open={isOpen} onClose={handleClose}>
+    <Drawer open={isOpen} onClose={closeDrawer}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Create new event</DrawerTitle>
         </DrawerHeader>
 
-        <EventForm onSubmitForm={handleClose} />
+        <EventForm onSubmitForm={closeDrawer} initialData={data} />
       </DrawerContent>
     </Drawer>
   );

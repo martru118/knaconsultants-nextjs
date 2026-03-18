@@ -1,17 +1,12 @@
+"use client"
+
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { eventSchema } from "@/lib/validators";
-import { createEvent } from "@/actions/events";
+import { createEvent, updateEvent } from "@/actions/events";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import z from "zod";
@@ -20,8 +15,9 @@ import { Switch } from "../ui/switch";
 import { Spinner } from "../ui/spinner";
 
 interface FormProps {
-  onSubmitForm: () => Promise<void>,
+  onSubmitForm: () => void,
   initialData?: {
+    id: string,
     title: string,
     description: string,
     duration: number,
@@ -40,6 +36,7 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
   } = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
+      id: initialData?.id || "",
       title: initialData?.title || "",
       description: initialData?.description || "",
       duration: initialData?.duration || 30,
@@ -50,12 +47,12 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
   const { 
     loading, 
     error: e, 
-    fn: fnCreateEvent 
-  } = useFetch(createEvent);
+    fn 
+  } = initialData?.id.length ? useFetch(updateEvent) : useFetch(createEvent)
 
   // handle submit state
   async function onSubmit(data: z.infer<typeof eventSchema>) {
-    await fnCreateEvent(data);
+    await fn(data);
     if (!loading && !e) onSubmitForm();
     router.refresh(); // refresh the page to show updated data
   };

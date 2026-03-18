@@ -1,12 +1,12 @@
 import { create } from "zustand";
 
-interface CopiedState {
+interface CopiedStore {
   isCopied: string | null;
   setCopied: (link: string) => void;
   resetCopied: () => void;
 }
 
-export const useCopy = create<CopiedState>((set) => ({
+export const useCopy = create<CopiedStore>((set) => ({
   isCopied: null,
   setCopied: (link) => set({ isCopied: link }),
   resetCopied: () => set({ isCopied: null }),

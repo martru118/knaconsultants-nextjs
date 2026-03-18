@@ -1,16 +1,16 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Link, Trash2 } from "lucide-react";
+import { Link, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import useFetch from "@/hooks/use-fetch";
-import { deleteEvent } from "@/actions/events";
-import { Event } from "@/lib/generated/prisma/client";
+import { deleteEvent, UserEvent } from "@/actions/events";
 import { useCopy } from "@/hooks/use-copy";
 import { useRouter } from "next/navigation";
+import { useDrawer } from "@/hooks/use-drawer";
 
 interface CardProps {
-  event: Event,
+  event: UserEvent,
   user: string,
   isPublic?: boolean,
 }
@@ -19,6 +19,8 @@ function EventCard({event, user, isPublic=false}: CardProps) {
   const isCopied = useCopy(state => state.isCopied)
   const setIsCopied = useCopy(state => state.setCopied)
   const resetCopied = useCopy(state => state.resetCopied)
+  const setEvent = useDrawer(state => state.setEvent)
+  const openDrawer = useDrawer(state => state.openDrawer)
   const router = useRouter()
 
   // delete event by id
@@ -77,6 +79,25 @@ function EventCard({event, user, isPublic=false}: CardProps) {
           >
             <Link className="mr-2 h-4 w-4" />
             {isCopied === event.id? "Copied!" : "Copy link"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setEvent({
+                id: event.id,
+                title: event.title,
+                description: event.description!,
+                duration: event.duration,
+                isPrivate: event.isPrivate,
+              })
+
+              // open form for editing
+              openDrawer()
+            }}
+            disabled={loading}
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit
           </Button>
           <Button
             variant="destructive"
