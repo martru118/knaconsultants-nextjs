@@ -6,6 +6,7 @@ import { createSafeAction } from "@/lib/safe-action";
 import { eventSchema } from "@/lib/validators";
 import { auth } from "@clerk/nextjs/server";
 import { cache } from "react";
+import z from "zod";
 
 export type UserEvent = Prisma.EventGetPayload<{
   include: {
@@ -17,10 +18,10 @@ export type UserEvent = Prisma.EventGetPayload<{
 
 export const createEvent = createSafeAction(
   eventSchema,
-  async(validatedData, clerkId) => {
+  async(validatedData, context) => {
     // get current user from db
     const user = await db.user.findUnique({
-      where: { clerkUserId: clerkId },
+      where: { clerkUserId: context },
     });
     if (!user) throw new Error("User not found");
 
@@ -41,10 +42,10 @@ export const createEvent = createSafeAction(
 
 export const updateEvent = createSafeAction(
   eventSchema,
-  async(validatedData, clerkId) => {
+  async(validatedData, context) => {
     // get current user from db
     const user = await db.user.findUnique({
-      where: { clerkUserId: clerkId },
+      where: { clerkUserId: context },
     });
     if (!user) throw new Error("User not found");
 
@@ -95,6 +96,29 @@ async function getDashboardEvents() {
 
 export const cachedDashboardEvents = cache(getDashboardEvents);
 
+export const deleteEvent = createSafeAction(
+  z.object({ eventId: z.uuid() }),
+  async(validatedData, context) => {
+    // get current user from db
+    const user = await db.user.findUnique({
+      where: { clerkUserId: context },
+    });
+    if (!user) throw new Error("User not found")
+  
+    // delete event from authenticated user
+    const event = await db.event.delete({
+      where: {
+        id: validatedData.eventId,
+        userId: user.id,
+      },
+    })
+    if (!event || event.userId !== user.id) throw new Error("Event not found")
+    
+    // deleted successfully
+    return true
+  }
+)
+/*
 export async function deleteEvent(eventId: string) {
   try {
     const { userId } = await auth();
@@ -127,3 +151,4 @@ export async function deleteEvent(eventId: string) {
     throw new Error(`Failed to delete event: ${error.message || error}`)
   }
 }
+*/

@@ -19,7 +19,7 @@ export function createSafeAction<TInput, TOutput>(
     // invalid form input
     const parse = schema.safeParse(input);
     if (!parse.success) {
-      return { validationErrors: parse.error.flatten().fieldErrors };
+      return { validationErrors: z.treeifyError(parse.error) };
     }
 
     // unauthorized user access

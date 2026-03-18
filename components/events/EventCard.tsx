@@ -23,14 +23,7 @@ function EventCard({event, user, isPublic=false}: CardProps) {
   const openDrawer = useDrawer(state => state.openDrawer)
   const router = useRouter()
 
-  // delete event by id
   const {loading, fn:fnDeleteEvent} = useFetch(deleteEvent)
-  async function handleDelete() {
-    if (window?.confirm("Are you sure you want to delete this event?")) {
-      await fnDeleteEvent(event.id)
-      router.refresh()
-    }
-  }
 
   if (isPublic) {
     // public event cards to be shown in user page
@@ -101,7 +94,12 @@ function EventCard({event, user, isPublic=false}: CardProps) {
           </Button>
           <Button
             variant="destructive"
-            onClick={handleDelete}
+            onClick={async () => {
+              if (window?.confirm("Are you sure you want to delete this event?")) {
+                await fnDeleteEvent({ eventId: event.id })
+                router.refresh()
+              }
+            }}
             disabled={loading}
           >
             <Trash2 className="mr-2 h-4 w-4" />
