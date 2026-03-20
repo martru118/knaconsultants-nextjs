@@ -6,8 +6,8 @@ export const usernameSchema = z.object({
     .min(3)
     .max(20)
     .regex(
-      /^[a-zA-Z0-9_-]+$/,
-      "Username can only contain letters, numbers, underscores, and hyphens"
+      /^[a-zA-Z0-9-]+$/,
+      "Username can only contain letters, numbers, and hyphens"
     ),
 });
 
@@ -53,7 +53,7 @@ export const availabilitySchema = z.object({
 export const bookingSchema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.email("Invalid email"),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+  date: z.iso.date("Invalid date format"),
   time: z.string().regex(/^\b((1[0-2]|0?[1-9]):([0-5][0-9]) ([AaPp][Mm]))$/, "Invalid time format"),
   additionalInfo: z.string().max(500, "Must be 500 characters or less").optional(),
 })

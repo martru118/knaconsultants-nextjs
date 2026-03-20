@@ -1,9 +1,15 @@
 import { UserMeetings } from "@/actions/meetings";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Calendar, Clock, Video } from "lucide-react";
+import CancelMeetingButton from "./cancel-meeting";
 
-export default function MeetingList(meetings: UserMeetings[], filter: string) {
+interface MeetingProps {
+  meetings: UserMeetings[],
+  filter: string,
+}
+
+export default function MeetingsList({meetings, filter}: MeetingProps) {
   if (meetings.length === 0) {
     return <p>No {filter} meetings found.</p>
   }
@@ -47,7 +53,7 @@ export default function MeetingList(meetings: UserMeetings[], filter: string) {
           </CardContent>
           {filter === "upcoming" && (
             <CardFooter className="flex justify-between">
-              Cancel Meeting
+              <CancelMeetingButton meetingId={meeting.id} />
             </CardFooter>
           )}
         </Card>

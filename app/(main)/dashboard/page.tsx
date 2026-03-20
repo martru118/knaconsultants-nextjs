@@ -11,11 +11,13 @@ import { useEffect } from "react";
 import useFetch from "@/hooks/use-fetch";
 import { updateUsername } from "@/actions/users";
 import z from "zod";
-import { cachedLatestMeetings, UserMeetings } from "@/actions/meetings";
+import { cachedLatestMeetings } from "@/actions/meetings";
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import { User } from "@clerk/nextjs/server";
-import { Link } from "lucide-react";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface LatestUpdatesProps {
   user: User
@@ -55,11 +57,11 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
       </CardHeader>
 
       {!loading ? (
-        <div className="space-y-6 font-light">
+        <div className="space-y-6 font-light pl-5">
           <div>
             {upcomingMeetings && upcomingMeetings?.length > 0 ? (
               <ul className="list-disc pl-5">
-                {upcomingMeetings?.map((meeting: UserMeetings) => (
+                {upcomingMeetings?.map((meeting) => (
                   <li key={meeting.id}>
                     {meeting.event.title} on{" "}
                     {format(
@@ -83,7 +85,7 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
 }
 
 function UniqueLinkCard({response, user}: UniqueLinkProps) {
-  // handle form state
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -95,6 +97,7 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
 
   // update username to db
   const {
+    data: state,
     loading,
     fn: fnUpdateUsername,
   } = useFetch(updateUsername);
@@ -103,7 +106,13 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
   }, [response]);
 
   async function onSubmitForm(data: z.infer<typeof usernameSchema>) {
-    fnUpdateUsername(data.username);
+    fnUpdateUsername({ username: data.username });
+
+    // handle success state
+    if (state) {
+      window.alert("Username updated successfully!")
+      router.refresh()
+    }
   }
 
   return (
@@ -122,7 +131,7 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
             {
               // error for form input
               errors.username && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.username.message}
                 </p>
               )
@@ -130,7 +139,7 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
             {
               // api error
               errors.username && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.root?.message}
                 </p>
               )
@@ -139,18 +148,17 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
         </form>
       </CardContent>
       <CardFooter className="flex gap-2">
-        <Button 
-          type="submit"
-          disabled={loading}
-          form="username-form"
-        >
+        <Button type="submit" disabled={loading} form="username-form">
           {loading? <Spinner data-icon="inline-start" /> : null}
           Update username
         </Button>
-        <Button variant="outline" disabled={loading}>
-          <Link className="mr-2 h-4 w-4" />
-          Copy link
-        </Button>
+
+        <Link href={`${window.location.origin}/${user?.username}`} target="_blank">
+          <Button type="button" variant="outline" disabled={loading}>
+            <ExternalLink className="mr-2 h-4 w-4" />
+            View profile
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   )

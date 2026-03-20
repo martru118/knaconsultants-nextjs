@@ -1,10 +1,13 @@
 "use server";
 
 import {
+  dateFormat,
   DAYS_OF_WEEK_IN_ORDER,
   defaultAvailability,
-} from "@/app/(main)/availability/constants";
+} from "@/constants/constants";
 import { db } from "@/lib/prisma";
+import { createSafeAction } from "@/lib/safe-action";
+import { availabilitySchema } from "@/lib/validators";
 import { auth } from "@clerk/nextjs/server";
 import {
   addDays,
@@ -14,8 +17,8 @@ import {
   parseISO,
   startOfDay,
 } from "date-fns";
+import { cache } from "react";
 
-const dateFormat = "yyyy-MM-dd";
 
 export async function getUserAvailability() {
   const { userId } = await auth();
@@ -32,7 +35,7 @@ export async function getUserAvailability() {
   if (!user || !user.availability) return null;
 
   // create availability data
-  const availabilityData: any = {
+  const availabilityData: Partial<typeof defaultAvailability> = {
     timeGap: user.availability.timeGap,
   };
 
@@ -57,68 +60,68 @@ export async function getUserAvailability() {
   return availabilityData;
 }
 
-export async function updateAvailability(data: typeof defaultAvailability) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+export const updateAvailability = createSafeAction(
+  availabilitySchema,
+  async(validatedData, context) => {
+    // get availability of current user
+    const user = await db.user.findUnique({
+      where: { clerkUserId: context },
+      include: {
+        availability: true,
+      },
+    });
+    if (!user) throw new Error("User not found");
 
-  // get availability of current user
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-    include: {
-      availability: true,
-    },
-  });
-  if (!user) throw new Error("User not found");
+    // transform the availability data into the format expected by the form
+    const availabilityData = Object.entries(validatedData).flatMap(
+      ([day, { isAvailable, startTime, endTime }]: any) => {
+        if (isAvailable) {
+          const baseDate = new Date().toISOString().split("T")[0];
+          return [
+            {
+              day: day.toUpperCase(),
+              startTime: new Date(`${baseDate}T${startTime}:00Z`),
+              endTime: new Date(`${baseDate}T${endTime}:00Z`),
+            },
+          ];
+        }
 
-  // transform the availability data into the format expected by the form
-  const availabilityData = Object.entries(data).flatMap(
-    ([day, { isAvailable, startTime, endTime }]: any) => {
-      if (isAvailable) {
-        const baseDate = new Date().toISOString().split("T")[0];
-        return [
-          {
-            day: day.toUpperCase(),
-            startTime: new Date(`${baseDate}T${startTime}:00Z`),
-            endTime: new Date(`${baseDate}T${endTime}:00Z`),
-          },
-        ];
+        return []
       }
+    );
 
-      return []
+    if (user.availability) {
+      // overwrite existing availability data
+      await db.availability.update({
+        where: {
+          id: user.availability.id,
+        },
+        data: {
+          timeGap: validatedData.timeGap,
+          days: {
+            deleteMany: {},
+            create: availabilityData,
+          },
+        },
+      });
+    } else {
+      // write new availability data
+      await db.availability.create({
+        data: {
+          userId: user.id,
+          timeGap: validatedData.timeGap,
+          days: {
+            create: availabilityData,
+          },
+        },
+      });
     }
-  );
 
-  if (user.availability) {
-    // overwrite existing availability data
-    await db.availability.update({
-      where: {
-        id: user.availability.id,
-      },
-      data: {
-        timeGap: data.timeGap,
-        days: {
-          deleteMany: {},
-          create: availabilityData,
-        },
-      },
-    });
-  } else {
-    // write new availability data
-    await db.availability.create({
-      data: {
-        userId: user.id,
-        timeGap: data.timeGap,
-        days: {
-          create: availabilityData,
-        },
-      },
-    });
+    return true
   }
+)
 
-  return { success: true };
-}
-
-export async function getEventAvailability(eventId: string) {
+async function getEventAvailability(eventId: string) {
   const event = await db.event.findUnique({
     where: {
       id: eventId,
@@ -147,14 +150,15 @@ export async function getEventAvailability(eventId: string) {
   });
 
   // empty case
-  if (!event || !event.user.availability) return [];
+  if (!event || !event.user.availability) return {};
 
   // create date limits for bookings
   const { availability, bookings } = event.user;
   const startDate = startOfDay(new Date());
   const endDate = addDays(startDate, 30);
 
-  const availableDates = [];
+  //const availableDates = [];
+  let availableDates: Record<string, string[]> = {}
   for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
     // find availability by weekday
     const dayOfWeek = format(date, "EEEE").toUpperCase();
@@ -173,15 +177,14 @@ export async function getEventAvailability(eventId: string) {
         availability.timeGap
       );
 
-      availableDates.push({
-        date: dateStr,
-        slots,
-      });
+      availableDates[dateStr] = slots
     }
   }
 
   return availableDates;
 }
+
+export const cachedEventAvailability = cache(getEventAvailability)
 
 function generateAvailableTimeslots(
   startTime: Date,
@@ -218,10 +221,14 @@ function generateAvailableTimeslots(
       const bookingStart = booking.startTime;
       const bookingEnd = booking.endTime;
 
+      // Availability must not fall under the following criteria
+      // 1. Current time falls in between the start and end times of an existing booking
+      // 2. End of a timeslot falls in between an existing booking time
+      // 3. Invalid time chosen
       return (
-        (firstTime >= bookingStart && firstTime < bookingEnd) || // current time falls in between booking start and end times
-        (slotEnd > bookingStart && slotEnd <= bookingEnd) || // slot end time falls in between booking times
-        (firstTime <= bookingStart && slotEnd >= bookingEnd) // invalid time
+        (firstTime >= bookingStart && firstTime < bookingEnd) ||
+        (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
+        (firstTime <= bookingStart && slotEnd >= bookingEnd)
       );
     });
 

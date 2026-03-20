@@ -3,11 +3,12 @@
 import { EventDetails } from "@/actions/event-details";
 import { bookingSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { format } from "date-fns";
+import { addDays, format, parse } from "date-fns";
+import { fromZonedTime } from "date-fns-tz"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,52 +17,60 @@ import { createBooking } from "@/actions/bookings";
 import useFetch from "@/hooks/use-fetch";
 import { Spinner } from "@/components/ui/spinner";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-
-const dateFormat = "yyyy-MM-dd"
+import { useBookingStore } from "@/hooks/use-booking-store";
+import { dateFormat, tzString } from "@/constants/constants";
 
 interface BookingFormProps {
   currentEvent: EventDetails,
-  availability: {
-    date: string;
-    slots: string[];
-  }[]
+  availability: Record<string, string[]>
 }
 
 function BookingForm({currentEvent, availability}: BookingFormProps) {
-  const [selectedDate, setSelectedDate] = useState<Date>()
-  const [selectedTime, setSelectedTime] = useState<string>("")
+  const selectedDate = useBookingStore(state => state.selectedDate)
+  const selectedTime = useBookingStore(state => state.selectedTime)
+  const setSelectedDate = useBookingStore(state => state.setDate)
+  const setSelectedTime = useBookingStore(state => state.setTime)
+
   const {
     register,
     handleSubmit,
     setValue,
-    formState: {errors},
+    formState: { errors },
   } = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
   });
 
+  const {loading, data, fn: fnCreateBooking} = useFetch(createBooking)
+
+  // fetch available time slots for particular day
+  const dateKey = format(selectedDate, dateFormat)
+  const availableDays = useMemo(() =>
+    Object.keys(availability).map(day => fromZonedTime(day, tzString)),
+  [loading])
+  const timeSlots = useMemo(() => 
+    dateKey in availability? availability[dateKey] : [],
+  [dateKey])
+
   // manually validate selected date and time 
   useEffect(() => {
-    if (selectedDate) setValue("date", format(selectedDate, dateFormat))
+    if (selectedDate) setValue("date", dateKey)
   }, [selectedDate, setValue])
   useEffect(() => {
     if (selectedTime) setValue("time", selectedTime)
   }, [selectedTime, setValue])
 
-  // send booking to Google Calendar
-  const {loading, data, fn: fnCreateBooking} = useFetch(createBooking)
-
   async function onSubmit(data: z.infer<typeof bookingSchema>) {
-    console.log(data)
-    /*
     if (!selectedDate || !selectedTime) {
       console.error("Date or time not selected")
       return
     }
 
+    // format am/pm time to utc
+    const ampm = parse(selectedTime, "hh:mm a", new Date())
+    const formattedTime = format(ampm, "HH:mm")
+
     // format start and end times
-    const startTime = new Date(
-      `${format(selectedDate, dateFormat)}T${selectedTime}`
-    )
+    const startTime = new Date(`${dateKey}T${formattedTime}Z`)
     const endTime = new Date(startTime.getTime() + currentEvent.duration*60000)
 
     // prepare booking data object
@@ -74,48 +83,31 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
       additionalInfo: data.additionalInfo,
     }
 
+    //console.log(bookingData)
     await fnCreateBooking(bookingData)
-    */
   }
 
-  /*
   // success state
-  if (data) {
+  if (data?.success) {
     return (
       <div className="text-center p-10 border bg-white">
         <h2 className="text-2xl font-bold mb-4">Booking successful!</h2>
-        {data.meetLink && (
+        {data.booking && (
           <p>
             Join the meeting:{" "}
             <a
-              href={data.meetLink}
+              href={data.booking}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 hover:underline"
             >
-              {data.meetLink}
+              {data.booking}
             </a>
           </p>
         )}
       </div>
     );
   }
-  */
-
-  // fetch available days
-  const availableDays = availability.map(day => {
-    // remove time zone string
-    const isoDate = new Date(day.date)
-    const dateOnly = new Date(isoDate.valueOf() + isoDate.getTimezoneOffset()*60*1000)
-    return dateOnly
-  })
-
-  // fetch available time slots for particular day
-  const timeSlots = selectedDate
-    ? availability.find(
-      day => day.date === format(selectedDate, dateFormat)
-    )?.slots || []
-  : []
 
   return (
     <div className="flex flex-col p-8 border bg-background lg:w-2/3">
@@ -125,15 +117,15 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
             mode="single" 
             animate
             required
-            timeZone="America/Toronto"
-            selected={selectedDate!} 
+            selected={selectedDate} 
             onSelect={date => {
-              setSelectedDate(date!)
-              setSelectedTime("")
+              setSelectedDate(date)
+              setSelectedTime(undefined)
             }}
-            disabled={[
-              {before: new Date()}
-            ]}
+            disabled={{
+              before: new Date(),
+              after: addDays(new Date(), 30),
+            }}
             modifiers={{
               available: availableDays,
             }}
@@ -156,13 +148,15 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
             {selectedDate && (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                 {timeSlots.map(slot => {
-                  return <Button 
-                    key={slot} 
-                    onClick={() => setSelectedTime(slot)}
-                    variant={selectedTime === slot? "default" : "outline"}
-                  >
-                    {slot}
-                  </Button>
+                  return (                  
+                    <Button 
+                      key={slot} 
+                      onClick={() => setSelectedTime(slot)}
+                      variant={selectedTime === slot? "default" : "outline"}
+                    >
+                      {slot}
+                    </Button>
+                  )
                 })}
               </div>
             )}
@@ -171,7 +165,8 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
       </div>
 
       {selectedTime && // display booking form when time is selected
-        <form className="max-w-full space-y-4 md:-mt-8" onSubmit={handleSubmit(onSubmit)}>
+        <form className="max-w-full space-y-4 md:-mt-10" onSubmit={handleSubmit(onSubmit)}>
+          <p>Your selection: {dateKey} at {selectedTime}</p>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="attendee-name">
@@ -183,7 +178,6 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
                 required
                 className="-mt-2"
               />
-
             </Field>
             <Field className="-mt-4">
               <FieldLabel htmlFor="attendee-email">
@@ -196,7 +190,6 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
                 required
                 className="-mt-2"
               />
-
             </Field>
           </FieldGroup>
           <Field>

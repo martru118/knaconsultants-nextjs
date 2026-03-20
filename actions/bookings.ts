@@ -1,20 +1,23 @@
 "use server"
 
-import { Booking } from "@/lib/generated/prisma/client";
+import { tzString } from "@/constants/constants";
+import { getOauthClient } from "@/lib/check-oauth";
 import { db } from "@/lib/prisma";
 import { clerkClient } from "@clerk/nextjs/server";
-import { calendar_v3, google } from "googleapis";
-import { success } from "zod";
+import { fromZonedTime } from "date-fns-tz";
+import { google } from "googleapis";
+import z from "zod";
 
-async function getOauthClient(clerkUserId: string) {
-  try{
+const MeetingSchema = z.object({
+  eventId: z.uuid(),
+  name: z.string(),
+  email: z.email(),
+  startTime: z.date("Invalid date format"),
+  endTime: z.date("Invalid date format"),
+  additionalInfo: z.string().optional(),
+})
 
-  } catch (error: any) {
-    throw new Error(`Failed to get OAuth client: ${error.message }`)
-  }
-}
-
-export async function createBooking(bookingData: Booking) {
+export async function createBooking(bookingData: z.infer<typeof MeetingSchema>) {
   try {
     const event = await db.event.findUnique({
       where: {
@@ -26,20 +29,10 @@ export async function createBooking(bookingData: Booking) {
     })
     if (!event) throw new Error("Event not found")
 
-    // get oauth token
-    const client = await clerkClient()
-    const { data } = await client.users.getUserOauthAccessToken(
-      event.user.clerkUserId,
-      "google",
-    )
-
-    const token = data[0].token
-    if (!token || data.length === 0) throw new Error("No Oauth data or token found for the user.")
-
-    // setup Google oauth client
-    const oauthClient = new google.auth.OAuth2()
-    oauthClient.setCredentials({access_token: token})
-    //return oauthClient
+    // get oauth client
+    const oauthClient = await getOauthClient(event.user.clerkUserId)
+    const bookingStart = fromZonedTime(bookingData.startTime, tzString)
+    const bookingEnd = fromZonedTime(bookingData.endTime, tzString)
 
     // generate Google Meet link
     const meetResponse = await google.calendar({
@@ -48,11 +41,12 @@ export async function createBooking(bookingData: Booking) {
     }).events.insert({
       calendarId: "primary",
       conferenceDataVersion: 1,
+      sendUpdates: "all",
       requestBody: {
         summary: `${bookingData.name} - ${event?.title}`,
         description: bookingData.additionalInfo,
-        start: {dateTime: bookingData.startTime.toISOString()},
-        end: {dateTime: bookingData.endTime.toISOString()},
+        start: {dateTime: bookingStart.toISOString()},
+        end: {dateTime: bookingEnd.toISOString()},
         attendees: [
           {email: bookingData.email},
           {email: event.user.email},
@@ -69,14 +63,14 @@ export async function createBooking(bookingData: Booking) {
     const googleId = meetResponse.data.id
 
     // add booking to db
-    const booking = await db.booking.create({
+    await db.booking.create({
       data: {
         eventId: event.id,
         userId: event.userId,
         name: bookingData.name,
         email: bookingData.email,
-        startTime: bookingData.startTime,
-        endTime: bookingData.endTime,
+        startTime: bookingStart,
+        endTime: bookingEnd,
         additionalInfo: bookingData.additionalInfo,
         meetLink: meetingLink!,
         googleEventId: googleId!,
@@ -84,14 +78,10 @@ export async function createBooking(bookingData: Booking) {
     })
 
     return {
-      sucess: true,
+      success: true,
       booking: meetingLink
     }
   } catch (error: any) {
-    console.error("Error creating booking:", error)
-    return {
-      success: false,
-      error: error.message,
-    }
+    throw new Error(`Error creating booking: ${error.message}`)
   }
 }

@@ -38,7 +38,7 @@ async function EventBookingPage({params}: EventPageProps) {
       <EventDetailsCard event={eventDetails} />
 
       <Suspense fallback={<div>Loading booking form...</div>}>
-        <BookingForm currentEvent={eventDetails} availability={availabilities}/>
+        <BookingForm currentEvent={eventDetails} availability={availabilities} />
       </Suspense>
     </div>
   );

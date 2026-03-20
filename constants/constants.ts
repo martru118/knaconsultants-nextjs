@@ -19,3 +19,6 @@ export const DAYS_OF_WEEK_IN_ORDER = [
   "saturday",
   "sunday",
 ] as const
+
+export const dateFormat = "yyyy-MM-dd" as const
+export const tzString = "America/Toronto" as const

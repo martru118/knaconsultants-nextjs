@@ -118,37 +118,3 @@ export const deleteEvent = createSafeAction(
     return true
   }
 )
-/*
-export async function deleteEvent(eventId: string) {
-  try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
-  
-    // get current user from db
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-    if (!user) throw new Error("User not found")
-  
-    // find events made by current user
-    const event = await db.event.findUnique({
-      where: {
-        id: eventId,
-      },
-    })
-    if (!event || event.userId !== user.id) throw new Error("Event not found")
-  
-    // delete event from authenticated user
-    await db.event.delete({
-      where: {
-        id: eventId,
-        userId: user.id,
-      },
-    })
-  
-    return true
-  } catch (error: any) {
-    throw new Error(`Failed to delete event: ${error.message || error}`)
-  }
-}
-*/
