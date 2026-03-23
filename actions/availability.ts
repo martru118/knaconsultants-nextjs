@@ -11,9 +11,8 @@ import { availabilitySchema } from "@/lib/validators";
 import { auth } from "@clerk/nextjs/server";
 import {
   addDays,
-  addMinutes,
   format,
-  isBefore,
+  isAfter,
   parseISO,
   startOfDay,
 } from "date-fns";
@@ -157,8 +156,7 @@ async function getEventAvailability(eventId: string) {
   const startDate = startOfDay(new Date());
   const endDate = addDays(startDate, 30);
 
-  //const availableDates = [];
-  let availableDates: Record<string, string[]> = {}
+  const availableDates: Record<string, string[]> = {}
   for (let date = startDate; date <= endDate; date = addDays(date, 1)) {
     // find availability by weekday
     const dayOfWeek = format(date, "EEEE").toUpperCase();
@@ -198,20 +196,8 @@ function generateAvailableTimeslots(
   timeGap: number = 0
 ) {
   const slots = [];
-  let firstTime = parseISO(
-    `${dateStr}T${startTime.toISOString().slice(11, 16)}`
-  );
-  const secondTime = parseISO(
-    `${dateStr}T${endTime.toISOString().slice(11, 16)}`
-  );
-
-  // exclude past timeslots
-  const now = new Date();
-  if (format(now, dateFormat) === dateStr) {
-    firstTime = isBefore(firstTime, now)
-      ? addMinutes(now, timeGap)
-      : firstTime;
-  }
+  let firstTime = parseISO(`${dateStr}T${startTime.toISOString().slice(11, 16)}`);
+  const secondTime = parseISO(`${dateStr}T${endTime.toISOString().slice(11, 16)}`);
 
   while (firstTime < secondTime) {
     const slotEnd = new Date(firstTime.getTime() + duration * 60000);
@@ -233,7 +219,7 @@ function generateAvailableTimeslots(
     });
 
     // push all available timeslots
-    if (isSlotAvailable) slots.push(format(firstTime, "p"));
+    if (isSlotAvailable && isAfter(firstTime, new Date())) slots.push(format(firstTime, "p"));
     firstTime = slotEnd;
   }
 

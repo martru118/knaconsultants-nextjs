@@ -1,14 +1,11 @@
 "use server"
 
-import { tzString } from "@/constants/constants";
 import { getOauthClient } from "@/lib/check-oauth";
 import { db } from "@/lib/prisma";
-import { clerkClient } from "@clerk/nextjs/server";
-import { fromZonedTime } from "date-fns-tz";
 import { google } from "googleapis";
 import z from "zod";
 
-const MeetingSchema = z.object({
+const meetingSchema = z.object({
   eventId: z.uuid(),
   name: z.string(),
   email: z.email(),
@@ -17,11 +14,16 @@ const MeetingSchema = z.object({
   additionalInfo: z.string().optional(),
 })
 
-export async function createBooking(bookingData: z.infer<typeof MeetingSchema>) {
+export async function createBooking(bookingData: z.infer<typeof meetingSchema>) {
   try {
+    // validate incoming data
+    const {success, data: meetingData} = meetingSchema.safeParse(bookingData)
+    if (!success) throw new Error("Invalid data")
+
+    // get event info from db
     const event = await db.event.findUnique({
       where: {
-        id: bookingData.eventId
+        id: meetingData.eventId,
       },
       include: {
         user: true
@@ -31,8 +33,8 @@ export async function createBooking(bookingData: z.infer<typeof MeetingSchema>) 
 
     // get oauth client
     const oauthClient = await getOauthClient(event.user.clerkUserId)
-    const bookingStart = fromZonedTime(bookingData.startTime, tzString)
-    const bookingEnd = fromZonedTime(bookingData.endTime, tzString)
+    const bookingStart = meetingData.startTime
+    const bookingEnd = meetingData.endTime
 
     // generate Google Meet link
     const meetResponse = await google.calendar({
@@ -43,12 +45,12 @@ export async function createBooking(bookingData: z.infer<typeof MeetingSchema>) 
       conferenceDataVersion: 1,
       sendUpdates: "all",
       requestBody: {
-        summary: `${bookingData.name} - ${event?.title}`,
-        description: bookingData.additionalInfo,
+        summary: `${meetingData.name} - ${event?.title}`,
+        description: meetingData.additionalInfo,
         start: {dateTime: bookingStart.toISOString()},
         end: {dateTime: bookingEnd.toISOString()},
         attendees: [
-          {email: bookingData.email},
+          {email: meetingData.email},
           {email: event.user.email},
         ],
         conferenceData: {
@@ -67,11 +69,11 @@ export async function createBooking(bookingData: z.infer<typeof MeetingSchema>) 
       data: {
         eventId: event.id,
         userId: event.userId,
-        name: bookingData.name,
-        email: bookingData.email,
+        name: meetingData.name,
+        email: meetingData.email,
         startTime: bookingStart,
         endTime: bookingEnd,
-        additionalInfo: bookingData.additionalInfo,
+        additionalInfo: meetingData.additionalInfo,
         meetLink: meetingLink!,
         googleEventId: googleId!,
       }

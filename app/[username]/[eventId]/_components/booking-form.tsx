@@ -19,6 +19,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { useBookingStore } from "@/hooks/use-booking-store";
 import { dateFormat, tzString } from "@/constants/constants";
+import { Separator } from "@/components/ui/separator";
+
+const today = new Date()
 
 interface BookingFormProps {
   currentEvent: EventDetails,
@@ -46,7 +49,7 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   const dateKey = format(selectedDate, dateFormat)
   const availableDays = useMemo(() =>
     Object.keys(availability).map(day => fromZonedTime(day, tzString)),
-  [loading])
+  [])
   const timeSlots = useMemo(() => 
     dateKey in availability? availability[dateKey] : [],
   [dateKey])
@@ -70,7 +73,7 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
     const formattedTime = format(ampm, "HH:mm")
 
     // format start and end times
-    const startTime = new Date(`${dateKey}T${formattedTime}Z`)
+    const startTime = new Date(`${dateKey}T${formattedTime}`)
     const endTime = new Date(startTime.getTime() + currentEvent.duration*60000)
 
     // prepare booking data object
@@ -83,15 +86,15 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
       additionalInfo: data.additionalInfo,
     }
 
-    //console.log(bookingData)
+    //console.log(startTime.toISOString())
     await fnCreateBooking(bookingData)
   }
 
   // success state
   if (data?.success) {
     return (
-      <div className="text-center p-10 border bg-white">
-        <h2 className="text-2xl font-bold mb-4">Booking successful!</h2>
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-4">✅ Booking successful!</h2>
         {data.booking && (
           <p>
             Join the meeting:{" "}
@@ -110,12 +113,11 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
   }
 
   return (
-    <div className="flex flex-col p-8 border bg-background lg:w-2/3">
-      <div className="md:h-96 flex flex-col md:flex-row gap-5">
+    <>
+      <div className="md:h-85 flex flex-col md:flex-row gap-5">
         <div className="max-w-full">
           <DayPicker 
             mode="single" 
-            animate
             required
             selected={selectedDate} 
             onSelect={date => {
@@ -123,20 +125,21 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
               setSelectedTime(undefined)
             }}
             disabled={{
-              before: new Date(),
-              after: addDays(new Date(), 30),
+              before: today,
+              after: addDays(today, 30),
+            }}
+            classNames={{
+              selected: `font-bold outline-3 outline-blue-700 w-10 h-10 rounded-full`,
             }}
             modifiers={{
               available: availableDays,
             }}
-            modifiersStyles={{
-              available: {
-                background: "lightblue",
-                borderRadius: 100,
-              }
+            modifiersClassNames={{
+              available: `bg-blue-200 w-10 h-10 rounded-full`,
             }}
           />
         </div>
+        <Separator className="lg:visible" orientation="vertical" />
         <div className="max-w-full h-full mt-2 md:overflow-scroll no-scrollbar">
           <div className="mb-5">
             <h3 className="text-lg font-semibold mb-2">
@@ -165,7 +168,7 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
       </div>
 
       {selectedTime && // display booking form when time is selected
-        <form className="max-w-full space-y-4 md:-mt-10" onSubmit={handleSubmit(onSubmit)}>
+        <form className="max-w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <p>Your selection: {dateKey} at {selectedTime}</p>
           <FieldGroup>
             <Field>
@@ -219,7 +222,7 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
           </div>
         </form>
       }
-    </div>
+    </>
   );
 }
 

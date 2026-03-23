@@ -5,6 +5,7 @@ import EventDetailsCard from "./_components/event-details";
 import { Suspense } from "react";
 import BookingForm from "./_components/booking-form";
 import { cachedEventAvailability } from "@/actions/availability";
+import { BeatLoader } from "react-spinners";
 
 interface EventPageProps {
   params: Promise<{username: string, eventId: string}>
@@ -37,11 +38,22 @@ async function EventBookingPage({params}: EventPageProps) {
     <div className="max-w-[90-vw] flex flex-col justify-center lg:flex-row px-4 py-8">
       <EventDetailsCard event={eventDetails} />
 
-      <Suspense fallback={<div>Loading booking form...</div>}>
-        <BookingForm currentEvent={eventDetails} availability={availabilities} />
-      </Suspense>
+      <div className="flex flex-col p-8 border bg-background lg:w-2/3">
+        <Suspense fallback={<BookingLoader />}>
+          <BookingForm currentEvent={eventDetails} availability={availabilities} />
+        </Suspense>
+      </div>
     </div>
   );
+}
+
+function BookingLoader() {
+  return (
+    <div className="flex flex-col w-full m-auto gap-2 items-center">
+      <BeatLoader size={20} />
+      <p>Loading booking info...</p>
+    </div>
+  )
 }
 
 export default EventBookingPage;
