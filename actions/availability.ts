@@ -11,13 +11,14 @@ import { availabilitySchema } from "@/lib/validators";
 import { auth } from "@clerk/nextjs/server";
 import {
   addDays,
+  addMinutes,
   format,
   isAfter,
   parseISO,
   startOfDay,
 } from "date-fns";
+import { revalidatePath } from "next/cache";
 import { cache } from "react";
-
 
 export async function getUserAvailability() {
   const { userId } = await auth();
@@ -116,7 +117,7 @@ export const updateAvailability = createSafeAction(
       });
     }
 
-    return true
+    revalidatePath("/[username]/[eventId]", "page")
   }
 )
 
@@ -198,6 +199,7 @@ function generateAvailableTimeslots(
   const slots = [];
   let firstTime = parseISO(`${dateStr}T${startTime.toISOString().slice(11, 16)}`);
   const secondTime = parseISO(`${dateStr}T${endTime.toISOString().slice(11, 16)}`);
+  const timeWithGap = addMinutes(firstTime, timeGap)
 
   while (firstTime < secondTime) {
     const slotEnd = new Date(firstTime.getTime() + duration * 60000);
@@ -219,7 +221,7 @@ function generateAvailableTimeslots(
     });
 
     // push all available timeslots
-    if (isSlotAvailable && isAfter(firstTime, new Date())) slots.push(format(firstTime, "p"));
+    if (isSlotAvailable && isAfter(timeWithGap, new Date())) slots.push(format(firstTime, "p"));
     firstTime = slotEnd;
   }
 

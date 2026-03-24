@@ -3,20 +3,17 @@
 import { cancelMeeting } from "@/actions/meetings";
 import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
-import { useRouter } from "next/navigation";
 
 interface CancelMeetingProps {
   meetingId: string,
 }
 
 export default function CancelMeetingButton({meetingId}: CancelMeetingProps) {
-  const router = useRouter()
   const { loading, error, fn: fnCancelMeeting } = useFetch(cancelMeeting)
 
   async function handleCancel() {
     if (window.confirm("Are you sure you want to cancel this meeting?")) {
       await fnCancelMeeting({ meetingId: meetingId });
-      router.refresh();
     }
   }
 

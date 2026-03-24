@@ -4,8 +4,9 @@ import { getOauthClient } from "@/lib/check-oauth";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { db } from "@/lib/prisma";
 import { createSafeAction } from "@/lib/safe-action";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { google } from "googleapis";
+import { revalidatePath } from "next/cache";
 import { cache } from "react";
 import z from "zod";
 
@@ -133,6 +134,6 @@ export const cancelMeeting = createSafeAction(
       },
     });
 
-    return true;
+    revalidatePath("/meetings")
   }
 )

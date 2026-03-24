@@ -5,6 +5,7 @@ import { db } from "@/lib/prisma";
 import { createSafeAction } from "@/lib/safe-action";
 import { eventSchema } from "@/lib/validators";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import { cache } from "react";
 import z from "zod";
 
@@ -36,7 +37,9 @@ export const createEvent = createSafeAction(
       },
     });
   
-    return true;
+    // created successfully
+    revalidatePath("/events")
+    revalidatePath("/[username]", "page")
   }
 )
 
@@ -63,7 +66,9 @@ export const updateEvent = createSafeAction(
       },
     })
 
-    return true
+    // updated successfully
+    revalidatePath("/events")
+    revalidatePath("/[username]", "page")
   }
 )
 
@@ -115,6 +120,7 @@ export const deleteEvent = createSafeAction(
     if (!event || event.userId !== user.id) throw new Error("Event not found")
     
     // deleted successfully
-    return true
+    revalidatePath("/events")
+    revalidatePath("/[username]", "page")
   }
 )

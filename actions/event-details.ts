@@ -16,7 +16,7 @@ export type EventDetails = Prisma.EventGetPayload<{
   }
 }>
 
-async function getEventDetails(username: string, eventId: string): Promise<EventDetails> {
+async function getEventDetails(username: string, eventId: string) {
   // find event by username and event id
   const event = await db.event.findFirst({
     where: {
@@ -36,7 +36,7 @@ async function getEventDetails(username: string, eventId: string): Promise<Event
     }
   })
 
-  return event!
+  return event
 }
 
 export const cachedEventDetails = cache(getEventDetails)
