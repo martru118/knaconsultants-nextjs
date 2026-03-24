@@ -2,7 +2,7 @@
 "use client";
 
 import { Controller, Form, useForm } from "react-hook-form";
-import { DAYS_OF_WEEK_IN_ORDER, defaultAvailability } from "../constants";
+import { DAYS_OF_WEEK_IN_ORDER, defaultAvailability } from "../../../../constants/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { availabilitySchema } from "@/lib/validators";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,19 +12,20 @@ import useFetch from "@/hooks/use-fetch";
 import { updateAvailability } from "@/actions/availability";
 import z from "zod";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
 
 interface FormProps {
-  initialData: typeof defaultAvailability;
+  initialData: Partial<typeof defaultAvailability>
 }
 
-function AvailabilityForm({ initialData }: FormProps) {
+function AvailabilityForm({ initialData }: FormProps) {  
   const {
     register,
     handleSubmit,
     control,
     setValue,
     watch,
-    formState: {errors},
+    formState: { errors },
   } = useForm<z.infer<typeof availabilitySchema>>({
     resolver: zodResolver(availabilitySchema),
     defaultValues: {...initialData},
@@ -116,15 +117,17 @@ function AvailabilityForm({ initialData }: FormProps) {
 
         {errors.timeGap && (
           // error handling for time gap input
-          <p className="text-red-500 text-xs mt-1">{errors.timeGap.message}</p>
+          <p className="text-destructive text-sm">{errors.timeGap.message}</p>
         )}
       </div>
 
-      {e && <p className="text-red-500 text-xs mt-1">{e}</p>}
-      <Button type="submit" disabled={loading}>
-        {loading? <Spinner data-icon="inline-start" /> : null}
-        Update schedule
-      </Button>
+      <div className="flex flex-row items-center space-x-4">
+        <Button type="submit" disabled={loading}>
+          {loading? <Spinner data-icon="inline-start" /> : null}
+          Update schedule
+        </Button>
+        {e && <p className="text-destructive text-sm">{e.message}</p>}
+      </div>
     </form>
   );
 }

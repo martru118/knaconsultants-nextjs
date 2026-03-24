@@ -2,6 +2,7 @@
 
 import { EventDetails } from "@/actions/event-details";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { tzString } from "@/constants/constants";
 import { Clock, Globe } from "lucide-react";
 
 interface EventDetailsProps{
@@ -34,7 +35,7 @@ export default function EventDetailsCard({event}: EventDetailsProps) {
       </div>
       <div className="flex items-center mb-4">
         <Globe className="mr-2" />
-        <span>America/Toronto</span>
+        <span>{tzString}</span>
       </div>
       <p className="text-gray-700">{event.description}</p>
     </div>

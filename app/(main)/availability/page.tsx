@@ -1,10 +1,10 @@
 import { getUserAvailability } from "@/actions/availability";
 import { Suspense } from "react";
 import AvailabilityForm from "./_components/availability-form";
-import { defaultAvailability } from "./constants";
+import { defaultAvailability } from "../../../constants/constants";
 
 async function AvailabilityPage() {
-  const availability: typeof defaultAvailability = await getUserAvailability()
+  const availability = await getUserAvailability()
 
   return (
     <div className="mx-auto">

@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { eventSchema } from "@/lib/validators";
 import { createEvent, updateEvent } from "@/actions/events";
-import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import z from "zod";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
@@ -26,12 +25,12 @@ interface FormProps {
 }
 
 function EventForm ({ onSubmitForm, initialData }: FormProps) {
-  const router = useRouter();
   const {
     register,
     control,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
@@ -53,8 +52,16 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
   // handle submit state
   async function onSubmit(data: z.infer<typeof eventSchema>) {
     await fn(data);
-    if (!loading && !e) onSubmitForm();
-    router.refresh(); // refresh the page to show updated data
+
+    // handle error state
+    if (e) {
+      setError("root", {
+        message: e.message,
+      })
+    }
+
+    // handle success state
+    if (!loading && !e) onSubmitForm()
   };
 
   return (
@@ -68,7 +75,7 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
             <FieldLabel htmlFor="event-title">Title</FieldLabel>
             <Input id="event-title" {...register("title")} className="-mt-2" />
             {errors.title && (
-              <p className="text-red-500 text-xs -mt-1">{errors.title.message}</p>
+              <p className="text-destructive text-sm -mt-2">{errors.title.message}</p>
             )}
           </Field>
           <Field>
@@ -82,7 +89,7 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
               className="-mt-2"
             />
             {errors.duration && (
-              <p className="text-red-500 text-xs -mt-1">{errors.duration.message}</p>
+              <p className="text-destructive text-sm -mt-2">{errors.duration.message}</p>
             )}
           </Field>
         </div>
@@ -95,13 +102,13 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
             className="-mt-2"
           />
           {errors.description && (
-            <p className="text-red-500 text-xs -mt-1">
+            <p className="text-destructive text-sm -mt-2">
               {errors.description.message}
             </p>
           )}
         </Field>
 
-        <Field orientation="horizontal">
+        <Field className="mb-4" orientation="horizontal">
           <Controller
             name="isPrivate"
             control={control}
@@ -116,12 +123,12 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
           />
           <FieldLabel htmlFor="event-isprivate" className="text-md">Private</FieldLabel>
 
+          {errors && <p className="text-destructive text-sm">{errors.root?.message}</p>}
           <Button type="submit" disabled={loading}>
             {loading? <Spinner data-icon="inline-start" /> : null}
             Save
           </Button>
         </Field>
-        {errors && <p className="text-destructive text-xs mt-1">{errors.root?.message}</p>}
       </FieldGroup>
     </form>
   );

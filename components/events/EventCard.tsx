@@ -6,7 +6,6 @@ import { Button } from "../ui/button";
 import useFetch from "@/hooks/use-fetch";
 import { deleteEvent, UserEvent } from "@/actions/events";
 import { useCopy } from "@/hooks/use-copy";
-import { useRouter } from "next/navigation";
 import { useDrawer } from "@/hooks/use-drawer";
 
 interface CardProps {
@@ -16,21 +15,12 @@ interface CardProps {
 }
 
 function EventCard({event, user, isPublic=false}: CardProps) {
-  const isCopied = useCopy(state => state.isCopied)
-  const setIsCopied = useCopy(state => state.setCopied)
-  const resetCopied = useCopy(state => state.resetCopied)
-  const setEvent = useDrawer(state => state.setEvent)
-  const openDrawer = useDrawer(state => state.openDrawer)
-  const router = useRouter()
-
-  const {loading, fn:fnDeleteEvent} = useFetch(deleteEvent)
-
   if (isPublic) {
     // public event cards to be shown in user page
     return (
-      <Card className="flex flex-col justify-between cursor-pointer">
+      <Card className="flex flex-col h-full justify-between cursor-pointer">
         <CardHeader>
-          <CardTitle className="text-2xl">{event.title}</CardTitle>
+          <CardTitle className="text-xl line-clamp-3">{event.title}</CardTitle>
           <CardDescription className="flex justify-between">
             <span>
               {event.duration} mins
@@ -39,16 +29,24 @@ function EventCard({event, user, isPublic=false}: CardProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p>{event.description}</p>
+          <p className="line-clamp-5">{event.description}</p>
         </CardContent>
       </Card>
     )
   } else {
     // show all event cards in dashboard 
+    const isCopied = useCopy(state => state.isCopied)
+    const setIsCopied = useCopy(state => state.setCopied)
+    const resetCopied = useCopy(state => state.resetCopied)
+    const setEvent = useDrawer(state => state.setEvent)
+    const openDrawer = useDrawer(state => state.openDrawer)
+
+    const { loading, fn: fnDeleteEvent } = useFetch(deleteEvent)
+
     return (
-      <Card className="flex flex-col justify-between cursor-pointer">
+      <Card className="flex flex-col h-full justify-between">
         <CardHeader>
-          <CardTitle className="text-2xl">{event.title}</CardTitle>
+          <CardTitle className="text-2xl line-clamp-3">{event.title}</CardTitle>
           <CardDescription className="flex justify-between">
             <span>
               {event.duration} mins | {event.isPrivate ? "Private" : "Public"}
@@ -57,7 +55,7 @@ function EventCard({event, user, isPublic=false}: CardProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p>{event.description}</p>
+          <p className="line-clamp-5">{event.description}</p>
         </CardContent>
 
         <CardFooter className="flex gap-2">
@@ -97,7 +95,6 @@ function EventCard({event, user, isPublic=false}: CardProps) {
             onClick={async () => {
               if (window?.confirm("Are you sure you want to delete this event?")) {
                 await fnDeleteEvent({ eventId: event.id })
-                router.refresh()
               }
             }}
             disabled={loading}

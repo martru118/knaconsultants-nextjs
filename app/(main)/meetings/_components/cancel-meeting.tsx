@@ -25,7 +25,6 @@ export default function CancelMeetingButton({meetingId}: CancelMeetingProps) {
       <Button variant="destructive" onClick={handleCancel} disabled={loading}>
         {loading ? "Canceling..." : "Cancel Meeting"}
       </Button>
-      {error && <span className="text-destructive text-sm">{error.message}</span>}
     </div>
   )
 }
