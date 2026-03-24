@@ -53,7 +53,7 @@ async function UserPage({params}: UserPageProps) {
             return <Link key={`${event.id}`} href={`/${username}/${event.id}`}>
               <EventCard 
                 key={event.id}
-                event={event}
+                event={event as any}
                 user={username}
                 isPublic
               />

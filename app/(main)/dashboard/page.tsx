@@ -17,7 +17,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { User } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface LatestUpdatesProps {
   user: User
@@ -40,12 +39,13 @@ function Dashboard() {
 }
 
 function LatestMeetingsCard({user}: LatestUpdatesProps) {
-  // get latest meetings from Google Calendar
   const {
     loading,
     data: upcomingMeetings,
     fn: fnUpdates,
   } = useFetch(cachedLatestMeetings);
+
+  // get latest updates from Google Calendar
   useEffect(() => {
     (async () => await fnUpdates())();
   }, []);
@@ -73,7 +73,7 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
                 ))}
               </ul>
             ) : (
-              <p className="pl-5">No upcoming meetings</p>
+              <p>No upcoming meetings</p>
             )}
           </div>
         </div>
@@ -85,7 +85,6 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
 }
 
 function UniqueLinkCard({response, user}: UniqueLinkProps) {
-  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -95,24 +94,19 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
     resolver: zodResolver(usernameSchema),
   });
 
-  // update username to db
   const {
-    data: state,
     loading,
+    error: e,
     fn: fnUpdateUsername,
   } = useFetch(updateUsername);
+  
   useEffect(() => {
+    // get username from clerk
     setValue("username", user?.username || "");
   }, [response]);
 
   async function onSubmitForm(data: z.infer<typeof usernameSchema>) {
-    fnUpdateUsername({ username: data.username });
-
-    // handle success state
-    if (state) {
-      window.alert("Username updated successfully!")
-      router.refresh()
-    }
+    await fnUpdateUsername({ username: data.username });
   }
 
   return (
@@ -138,9 +132,9 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
             }
             {
               // api error
-              errors.username && (
+              e && (
                 <p className="text-destructive text-sm mt-1">
-                  {errors.root?.message}
+                  {e.message}
                 </p>
               )
             }
@@ -153,7 +147,11 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
           Update username
         </Button>
 
-        <Link href={`${window.location.origin}/${user?.username}`} target="_blank">
+        <Link 
+          href={`${window.location.origin}/${user?.username}`} 
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <Button type="button" variant="outline" disabled={loading}>
             <ExternalLink className="mr-2 h-4 w-4" />
             View profile

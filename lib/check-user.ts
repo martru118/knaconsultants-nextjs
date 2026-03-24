@@ -7,12 +7,31 @@ export async function checkUser() {
 
   try {
     // user is logged in
-    const loggedInUser = await db?.user.findUnique({
+    const loggedInUser = await db.user.findUnique({
       where: {
         clerkUserId: user.id,
       }
     })
-    if (loggedInUser) return loggedInUser
+    
+    if (loggedInUser) {
+      // sync changes between Clerk and db
+      if (loggedInUser.name !== user.fullName || loggedInUser.imageUrl !== user.imageUrl) {
+        const syncedUser = await db.user.update({
+          where: {
+            clerkUserId: user.id,
+          },
+          data: {
+            name: user.fullName,
+            imageUrl: user.imageUrl
+          }
+        })
+
+        return syncedUser
+      }
+
+      // current user session
+      return loggedInUser
+    }
 
     // generate dummy username based on slug
     const name = `${user.firstName} ${user.lastName}`;

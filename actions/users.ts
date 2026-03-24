@@ -1,15 +1,21 @@
 "use server";
 
 import { db } from "@/lib/prisma";
+import { usernameSchema } from "@/lib/validators";
 import { auth, clerkClient } from "@clerk/nextjs/server";
+import z from "zod";
 
-export async function updateUsername(username: string) {
+export async function updateUsername(user: z.infer<typeof usernameSchema>) {
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const { success, data } = usernameSchema.safeParse(user);
+  if (!userId || !success) throw new Error("Invalid format or user not authenticated");
 
   // check if username is already taken
+  const name = data.username;
   const existingUsername = await db.user.findUnique({
-    where: { username },
+    where: {
+      username: name,
+    },
   });
 
   if (existingUsername && existingUsername.id !== userId) {
@@ -19,29 +25,16 @@ export async function updateUsername(username: string) {
   // update username in database
   await db.user.update({
     where: { clerkUserId: userId },
-    data: { username },
+    data: { username: name },
   });
 
   //update username in Clerk
-  (await clerkClient()).users.updateUser(userId, {
-    username
-  })
-
-  return {
-    success: true
-  }
-}
-
-export async function getUserFromClerk(userId: string) {
-  // get user image
-  const client = await clerkClient()
-  const {fullName, imageUrl} = await client.users.getUser(userId)
-  return {fullName, imageUrl}
+  (await clerkClient()).users.updateUser(userId, user);
 }
 
 export async function getUserByUsername(username: string) {
   const user = await db.user.findUnique({
-    where: {username},
+    where: { username },
     select: {
       id: true,
       name: true,
@@ -49,10 +42,10 @@ export async function getUserByUsername(username: string) {
       imageUrl: true,
       events: {
         where: {
-          isPrivate: false
+          isPrivate: false,
         },
         orderBy: {
-          createdAt: "desc"
+          createdAt: "desc",
         },
         select: {
           id: true,
@@ -61,12 +54,12 @@ export async function getUserByUsername(username: string) {
           duration: true,
           isPrivate: true,
           _count: {
-            select: {bookings: true}
-          }
-        }
-      }
-    }
-  })
+            select: { bookings: true },
+          },
+        },
+      },
+    },
+  });
 
-  return user
+  return user;
 }
