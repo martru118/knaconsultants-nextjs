@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usernameSchema } from "@/lib/validators";
@@ -16,7 +16,8 @@ import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import { User } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { AlertTriangleIcon, ExternalLink } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription, AlertAction } from "@/components/ui/alert";
 
 interface LatestUpdatesProps {
   user: User
@@ -29,9 +30,11 @@ interface UniqueLinkProps {
 
 function Dashboard() {
   const { isLoaded, user } = useUser();
+  const providers = user?.externalAccounts.map(account => account.provider)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
+      {!providers?.includes("google") && <OnboardingAlert />}
       <LatestMeetingsCard user={user as any} />
       <UniqueLinkCard response={isLoaded} user={user as any} />
     </div>
@@ -107,6 +110,9 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
 
   async function onSubmitForm(data: z.infer<typeof usernameSchema>) {
     await fnUpdateUsername({ username: data.username });
+
+    // handle success state
+    if (!loading && !e) window.alert("Username updated successfully")
   }
 
   return (
@@ -157,8 +163,35 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
             View profile
           </Button>
         </Link>
+        <p className="text-sm font-light">Last updated: {user?.updatedAt.toLocaleString()}</p>
       </CardFooter>
     </Card>
+  )
+}
+
+function OnboardingAlert() {
+  const { openUserProfile } = useClerk()
+  
+  // when user is missing 
+  return (
+    <Alert className="max-w-full border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
+      <AlertTriangleIcon />
+      <AlertTitle>Connect your Google Account</AlertTitle>
+      <AlertDescription>
+        To allow clients to book meetings with you, you must connect your Google Account first.
+      </AlertDescription>
+
+      <AlertAction>
+        <Button 
+          onClick={() => openUserProfile() }
+          className="bg-amber-900 hover:bg-amber-700" 
+          size="xs" 
+          variant="default"
+        >
+          Connect
+        </Button>
+      </AlertAction>
+    </Alert>
   )
 }
 

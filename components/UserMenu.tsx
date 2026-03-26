@@ -1,7 +1,7 @@
 "use client"
 
 import { UserButton } from "@clerk/nextjs";
-import { ChartNoAxesGantt } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 
 function UserMenu() {
   return <UserButton appearance={{
@@ -12,7 +12,7 @@ function UserMenu() {
     <UserButton.MenuItems>
       <UserButton.Link 
         label="My Dashboard" 
-        labelIcon={<ChartNoAxesGantt size={15} />}
+        labelIcon={<LayoutDashboard size={15} />}
         href="/dashboard" 
       />
       <UserButton.Action label="manageAccount" />
