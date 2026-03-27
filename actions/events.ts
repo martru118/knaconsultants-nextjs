@@ -1,5 +1,6 @@
 "use server";
 
+import { getOwnership } from "@/lib/check-user";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { db } from "@/lib/prisma";
 import { createSafeAction } from "@/lib/safe-action";
@@ -20,11 +21,7 @@ export type UserEvent = Prisma.EventGetPayload<{
 export const createEvent = createSafeAction(
   eventSchema,
   async(validatedData, context) => {
-    // get current user from db
-    const user = await db.user.findUnique({
-      where: { clerkUserId: context },
-    });
-    if (!user) throw new Error("User not found");
+    const user = await getOwnership(context)
 
     // create user event
     await db.event.create({
@@ -46,11 +43,7 @@ export const createEvent = createSafeAction(
 export const updateEvent = createSafeAction(
   eventSchema,
   async(validatedData, context) => {
-    // get current user from db
-    const user = await db.user.findUnique({
-      where: { clerkUserId: context },
-    });
-    if (!user) throw new Error("User not found");
+    const user = await getOwnership(context)
 
     // overwrite existing user event
     await db.event.update({
@@ -77,10 +70,7 @@ async function getDashboardEvents() {
   if (!userId) throw new Error("Unauthorized");
 
   // get current user from db
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!user) throw new Error("User not found");
+  const user = await getOwnership(userId)
 
   // find events made by current user
   const event = await db.event.findMany({
@@ -105,10 +95,7 @@ export const deleteEvent = createSafeAction(
   z.object({ eventId: z.uuid() }),
   async(validatedData, context) => {
     // get current user from db
-    const user = await db.user.findUnique({
-      where: { clerkUserId: context },
-    });
-    if (!user) throw new Error("User not found")
+    const user = await getOwnership(context)
   
     // delete event from authenticated user
     const event = await db.event.delete({

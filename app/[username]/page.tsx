@@ -1,4 +1,4 @@
-import { getUserByUsername } from "@/actions/users";
+import { cachedUserEvents } from "@/actions/users";
 import EventCard from "@/components/events/EventCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Metadata } from "next";
@@ -11,7 +11,7 @@ interface UserPageProps {
 
 export async function generateMetadata({params}: UserPageProps): Promise<Metadata> {
   const {username} = await params
-  const user = await getUserByUsername(username)
+  const user = await cachedUserEvents(username)
 
   if (!user) return {
     title: "User not found"
@@ -27,7 +27,7 @@ export async function generateMetadata({params}: UserPageProps): Promise<Metadat
 async function UserPage({params}: UserPageProps) {
   // retrieve username from url
   const {username} = await params
-  const user = await getUserByUsername(username)
+  const user = await cachedUserEvents(username)
   if (!user) return notFound()
 
   return (

@@ -1,6 +1,7 @@
 "use server"
 
 import { getOauthClient } from "@/lib/check-oauth";
+import { getOwnership } from "@/lib/check-user";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { db } from "@/lib/prisma";
 import { createSafeAction } from "@/lib/safe-action";
@@ -29,10 +30,7 @@ export async function getUserMeetings(filter: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!user) throw new Error("User not found");
+  const user = await getOwnership(userId)
 
   // get meetings filtered by time
   const now = new Date();
@@ -67,10 +65,7 @@ async function getLatestMeetings() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!user) throw new Error("User not found");
+  const user = await getOwnership(userId)
 
   // get meetings filtered by time
   const now = new Date();
@@ -98,11 +93,7 @@ export const cachedLatestMeetings = cache(getLatestMeetings)
 export const cancelMeeting = createSafeAction(
   z.object({ meetingId: z.uuid() }),
   async (validatedData, context) => {
-    // get current user from db
-    const user = await db.user.findUnique({
-      where: { clerkUserId: context },
-    });
-    if (!user) throw new Error("User not found")
+    const user = await getOwnership(context)
 
     // get current meeting from db
     const bookingId = validatedData.meetingId

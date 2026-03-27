@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { usernameSchema } from "@/lib/validators";
 import { auth, clerkClient } from "@clerk/nextjs/server";
+import { cache } from "react";
 import z from "zod";
 
 export async function updateUsername(user: z.infer<typeof usernameSchema>) {
@@ -32,7 +33,7 @@ export async function updateUsername(user: z.infer<typeof usernameSchema>) {
   (await clerkClient()).users.updateUser(userId, user);
 }
 
-export async function getUserByUsername(username: string) {
+async function getUserEvents(username: string) {
   const user = await db.user.findUnique({
     where: { username },
     select: {
@@ -52,7 +53,6 @@ export async function getUserByUsername(username: string) {
           title: true,
           description: true,
           duration: true,
-          isPrivate: true,
           _count: {
             select: { bookings: true },
           },
@@ -63,3 +63,5 @@ export async function getUserByUsername(username: string) {
 
   return user;
 }
+
+export const cachedUserEvents = cache(getUserEvents)

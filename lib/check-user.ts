@@ -1,5 +1,6 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { db } from "./prisma";
+import { cache } from "react";
 
 export async function checkUser() {
   const user = await currentUser()
@@ -7,11 +8,7 @@ export async function checkUser() {
 
   try {
     // user is logged in
-    const loggedInUser = await db.user.findUnique({
-      where: {
-        clerkUserId: user.id,
-      }
-    })
+    const loggedInUser = await getOwnership(user.id)
     
     if (loggedInUser) {
       // sync changes between Clerk and db
@@ -56,3 +53,13 @@ export async function checkUser() {
     console.error(error)
   }
 }
+
+export const getOwnership = cache(async (userId: string) => {
+  // get current user from db
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+  if (!user) throw new Error("User not found")
+  
+  return user
+})
