@@ -18,6 +18,7 @@ import { User } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { AlertTriangleIcon, ExternalLink } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription, AlertAction } from "@/components/ui/alert";
+import { useRouter } from "next/navigation";
 
 interface LatestUpdatesProps {
   user: User
@@ -58,31 +59,32 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
       <CardHeader>
         <CardTitle>Welcome, {user?.firstName}</CardTitle>
       </CardHeader>
-
-      {!loading ? (
-        <div className="space-y-6 font-light pl-5">
-          <div>
-            {upcomingMeetings && upcomingMeetings?.length > 0 ? (
-              <ul className="list-disc pl-5">
-                {upcomingMeetings?.map((meeting) => (
-                  <li key={meeting.id}>
-                    {meeting.event.title} on{" "}
-                    {format(
-                      new Date(meeting.startTime),
-                      "MMM d, yyyy h:mm a"
-                    )}{" "}
-                    with {meeting.name}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No upcoming meetings</p>
-            )}
+      <CardContent>
+        {!loading ? (
+          <div className="space-y-6 font-light">
+            <div>
+              {upcomingMeetings && upcomingMeetings?.length > 0 ? (
+                <ul className="list-disc">
+                  {upcomingMeetings?.map((meeting) => (
+                    <li key={meeting.id}>
+                      {meeting.event.title} on{" "}
+                      {format(
+                        new Date(meeting.startTime),
+                        "MMM d, yyyy h:mm a"
+                      )}{" "}
+                      with {meeting.name}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No upcoming meetings</p>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <p className="pl-5">Loading updates...</p>
-      )}
+        ) : (
+          <p>Loading updates...</p>
+        )}
+      </CardContent>
     </Card>
   )
 }
@@ -119,6 +121,7 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
     <Card>
       <CardHeader>
         <CardTitle>Your unique link</CardTitle>
+        <p className="text-sm font-light">Last updated: {user?.updatedAt.toLocaleString()}</p>
       </CardHeader>
 
       <CardContent>
@@ -163,7 +166,6 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
             View profile
           </Button>
         </Link>
-        <p className="text-sm font-light">Last updated: {user?.updatedAt.toLocaleString()}</p>
       </CardFooter>
     </Card>
   )
@@ -171,8 +173,9 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
 
 function OnboardingAlert() {
   const { openUserProfile } = useClerk()
+  const router = useRouter()
   
-  // when user is missing 
+  // show when user is missing Google Account
   return (
     <Alert className="max-w-full border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
       <AlertTriangleIcon />
@@ -182,6 +185,14 @@ function OnboardingAlert() {
       </AlertDescription>
 
       <AlertAction>
+        <Button
+          onClick={() => router.refresh()}
+          className="mr-1"
+          size="xs" 
+          variant="outline"
+        >
+          Dismiss
+        </Button>
         <Button 
           onClick={() => openUserProfile() }
           className="bg-amber-900 hover:bg-amber-700" 

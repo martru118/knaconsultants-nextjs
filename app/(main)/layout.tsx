@@ -47,7 +47,7 @@ function AppLayout({ children }: LayoutProps) {
           </nav>
         </aside>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto px-2 py-4 md:p-8">
           <header className="flex justify-between items-center mb-4">
             <h2 className="text-5xl md:text-6xl gradient-title pt-2 md:pt-0 text-center md:text-left">
               {navOptions.find((option) => option.href === pathname)?.label}
