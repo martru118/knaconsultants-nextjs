@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { BarChart, Calendar, Clock, Users } from "lucide-react";
+import { Calendar, Clock, LayoutDashboard, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -9,7 +9,7 @@ import { BarLoader } from "react-spinners";
 
 // sidebar menu items
 const navOptions = [
-  { href: "/dashboard", label: "Dashboard", icon: BarChart },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/events", label: "Events", icon: Calendar },
   { href: "/meetings", label: "Meetings", icon: Users },
   { href: "/availability", label: "Availability", icon: Clock },

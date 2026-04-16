@@ -17,7 +17,7 @@ import { createBooking } from "@/actions/bookings";
 import useFetch from "@/hooks/use-fetch";
 import { Spinner } from "@/components/ui/spinner";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { useBookingStore } from "@/hooks/use-booking-store";
+import { useDayPicker } from "@/hooks/use-daypicker";
 import { dateFormat, tzString } from "@/constants/constants";
 import { Separator } from "@/components/ui/separator";
 
@@ -29,21 +29,29 @@ interface BookingFormProps {
 }
 
 function BookingForm({currentEvent, availability}: BookingFormProps) {
-  const selectedDate = useBookingStore(state => state.selectedDate)
-  const selectedTime = useBookingStore(state => state.selectedTime)
-  const setSelectedDate = useBookingStore(state => state.setDate)
-  const setSelectedTime = useBookingStore(state => state.setTime)
+  const {
+    selectedDate, 
+    selectedTime, 
+    setDate, 
+    setTime
+  } = useDayPicker()
 
   const {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
   });
 
-  const {loading, data, fn: fnCreateBooking} = useFetch(createBooking)
+  const {
+    data, 
+    loading, 
+    error: e,
+    fn: fnCreateBooking
+  } = useFetch(createBooking)
 
   // fetch available time slots for particular day
   const dateKey = format(selectedDate, dateFormat)
@@ -88,6 +96,13 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
 
     //console.log(startTime.toISOString())
     await fnCreateBooking(bookingData)
+
+    // handle error state
+    if (e) {
+      setError("root", {
+        message: e.message
+      })
+    }
   }
 
   // success state
@@ -119,10 +134,11 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
           <DayPicker 
             mode="single" 
             required
+            animate
             selected={selectedDate} 
             onSelect={date => {
-              setSelectedDate(date)
-              setSelectedTime(undefined)
+              setDate(date)
+              setTime(undefined)
             }}
             disabled={{
               before: today,
@@ -154,7 +170,15 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
                   return (                  
                     <Button 
                       key={slot} 
-                      onClick={() => setSelectedTime(slot)}
+                      onClick={() => {
+                        setTime(slot)
+
+                        // scroll to form section on click
+                        setTimeout(() => {                          
+                          const element = document.getElementById("booking-submit")
+                          element?.scrollIntoView({ behavior: "smooth" })
+                        }, 10);
+                      }}
                       variant={selectedTime === slot? "default" : "outline"}
                     >
                       {slot}
@@ -204,7 +228,7 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
             />
           </Field>
 
-          <div className="flex flex-row">
+          <div id="booking-submit" className="flex flex-col">
             <Button 
               type="submit"
               disabled={loading}
@@ -214,10 +238,13 @@ function BookingForm({currentEvent, availability}: BookingFormProps) {
               Schedule event
             </Button>
             {errors.date && (
-              <p className="text-destructive ml-2 mt-2">{errors.date.message}</p>
+              <p className="text-destructive text-sm mt-2">{errors.date.message}</p>
             )}
             {errors.time && (
-              <p className="text-destructive ml-2 mt-2">{errors.time.message}</p>
+              <p className="text-destructive text-sm mt-2">{errors.time.message}</p>
+            )}
+            {errors && (
+              <p className="text-destructive text-sm mt-2">{errors.root?.message}</p>
             )}
           </div>
         </form>
