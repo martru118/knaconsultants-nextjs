@@ -7,14 +7,15 @@
 */
 
 import { HeroHeader } from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
+import {HeroSection2} from "@/components/HeroSection2";
+import { ServicesBlock } from "@/components/ServicesBlock";
 
 export default function Home() {
   return (
     <main className="overflow-x-hidden">
-      {/* Hero Section */}
       <HeroHeader />
-      <HeroSection />
+      <HeroSection2 />
+      <ServicesBlock />
     </main>
   );
 }

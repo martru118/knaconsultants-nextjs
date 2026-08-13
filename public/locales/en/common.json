@@ -1,0 +1,74 @@
+{
+  "title": "K & A Consulting Ltd.",
+  "metadata": "Consulting for every step of your business",
+  "nav": [
+    {
+      "name": "Our Services",
+      "href": "#services"
+    },
+    {
+      "name": "Testimonials",
+      "href": "#testimonials"
+    },
+    {
+      "name": "FAQ",
+      "href": "#faq"
+    }
+  ],
+  "hero": {
+    "heading": "Turn your business ideas into reality",
+    "subheading": "We do consulting for every step of your business.",
+    "cta": "Book a free consultation",
+    "stats": [
+      {
+        "order": 0,
+        "number": "100+",
+        "caption": "businesses served"
+      },
+      {
+        "order": 1,
+        "number": "99%",
+        "caption": "client satisfaction"
+      },
+      {
+        "order": 2,
+        "number": "5x",
+        "caption": "average ROI"
+      }
+    ]
+  },
+  "services": {
+    "badge": "Our Services",
+    "heading": "Complete solutions for your business",
+    "subheading": "Everything you need to build, launch, and scale your business with confidence.",
+    "content": [
+      {
+        "title": "Financing",
+        "desc": "Get accepted for loans, leases, and mortgages to launch your business",
+        "features": ["Bank loans", "Property leasing", "Mortgages"],
+        "iconColor": "text-blue-500",
+        "bgColor": "bg-blue-500/10"
+      },
+      {
+        "title": "Immigration services",
+        "desc": "Get accepted for loans, leases, and mortgages to launch your business",
+        "features": ["Work visa approvals", "Employment assistance", "Chinese & Vietnamese language support"],
+        "iconColor": "text-purple-500",
+        "bgColor": "bg-purple-500/10"
+      },
+      {
+        "title": "Contracting",
+        "desc": "Get accepted for loans, leases, and mortgages to launch your business",
+        "features": ["React & Next.js", "TypeScript", "Performance Optimized"],
+        "iconColor": "text-red-500",
+        "bgColor": "bg-red-500/10"
+      }
+    ]
+  },
+  "testimonial": {
+    "quote": "Schedulrr has transformed how I manage my team's meetings. It's intuitive and saves us hours every week!",
+    "name": "Sarah Johnson",
+    "position": "CEO",
+    "company": "Apple Inc"
+  }
+}

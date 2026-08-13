@@ -1,21 +1,21 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { hero } from "../public/locales/en/common.json"
 
 export default function HeroSection() {
   return (
     <>
+      {/* Hero section */}
       <section>
         <div>
           <div className="aspect-2/3 relative z-10 flex flex-col justify-end px-6 lg:aspect-video">
             <div className="mx-auto w-full max-w-7xl pb-6 lg:px-12 lg:pb-32">
               <div className="max-w-xl">
                 <h1 className="text-balance font-semibold text-5xl md:text-6xl xl:text-7xl">
-                  Turn your business ideas into reality
+                  {hero.heading}
                 </h1>
-                <p className="mt-6 text-balance text-lg">
-                  Highly customizable components.
-                </p>
+                <p className="mt-6 text-balance text-lg">{hero.subheading}</p>
 
                 <div className="mt-8 flex items-center gap-2">
                   <Button
@@ -24,7 +24,7 @@ export default function HeroSection() {
                     className="h-12 rounded-full pl-5 pr-3 text-base"
                   >
                     <Link href="#link">
-                      <span className="text-nowrap">Book a free consultation</span>
+                      <span className="text-nowrap">{hero.cta}</span>
                       <ChevronRight className="ml-1" />
                     </Link>
                   </Button>
@@ -40,14 +40,16 @@ export default function HeroSection() {
           </div>
         </div>
       </section>
+
+      {/* Stats section */}
       <section className="bg-background py-6">
-        <div className="group relative m-auto max-w-7xl px-6">
-          <div className="flex flex-col items-center md:flex-row">
-            <div className="md:max-w-44 md:border-r md:pr-6">
-              <p className="text-end text-sm">Powering the best teams</p>
+        <div className="grid divide-y *:text-center md:grid-cols-3 md:gap-2 md:divide-x md:divide-y-0">
+          {hero.stats.map((stat, index) => (
+            <div className="space-y-1" key={index}>
+              <div className="text-2xl font-bold gradient-title">{stat.number}</div>
+              <p>{stat.caption}</p>
             </div>
-            <div className="**:fill-foreground relative py-6 md:w-[calc(100%-11rem)]"></div>
-          </div>
+          ))}
         </div>
       </section>
     </>
