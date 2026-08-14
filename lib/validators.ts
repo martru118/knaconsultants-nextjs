@@ -1,5 +1,6 @@
 import z from "zod";
 
+// username input schema in dashboard
 export const usernameSchema = z.object({
   username: z
     .string()
@@ -11,8 +12,9 @@ export const usernameSchema = z.object({
     ),
 });
 
+// event form schema
 export const eventSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   title: z
     .string()
     .min(1, "Title is required")
@@ -25,6 +27,7 @@ export const eventSchema = z.object({
   isPrivate: z.boolean(),
 });
 
+// availability schemas
 export const daySchema = z.object({
   isAvailable: z.boolean(),
   startTime: z.iso.time(),
@@ -50,10 +53,17 @@ export const availabilitySchema = z.object({
   timeGap: z.number().min(0, "Time gap must be greater than 0 minutes").int(),
 });
 
-export const bookingSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.email("Invalid email"),
+// booking form schemas
+export const dayPickerSchema = z.object({
   date: z.iso.date("Invalid date format"),
   time: z.string().regex(/^\b((1[0-2]|0?[1-9]):([0-5][0-9]) ([AaPp][Mm]))$/, "Invalid time format"),
+})
+
+export const bookingInputSchema = z.object({
+  name: z.string().min(2, "Name is required"),
+  email: z.email("Invalid email"),
   additionalInfo: z.string().max(500, "Must be 500 characters or less").optional(),
 })
+
+export const bookingSchema = dayPickerSchema.extend(bookingInputSchema.shape)
+export type BookingSchemaType = z.infer<typeof bookingSchema>

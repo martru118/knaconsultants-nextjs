@@ -6,6 +6,8 @@ import { Suspense } from "react";
 import BookingForm from "./_components/booking-form";
 import { cachedEventAvailability } from "@/actions/availability";
 import { BeatLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
+import { checkUser } from "@/lib/check-user";
 
 interface EventPageProps {
   params: Promise<{username: string, eventId: string}>
@@ -27,6 +29,9 @@ export async function generateMetadata({params}: EventPageProps): Promise<Metada
 }
 
 async function EventBookingPage({params}: EventPageProps) {
+  await checkUser()
+
+  // get event details from db
   const {username, eventId} = await params
   const eventDetails = await cachedEventDetails(username, eventId)
   if (!eventDetails) return notFound()
@@ -35,25 +40,45 @@ async function EventBookingPage({params}: EventPageProps) {
   const availabilities = await cachedEventAvailability(eventId)
 
   return (
-    <div className="max-w-[90-vw] flex flex-col justify-center lg:flex-row px-4 py-8">
-      <EventDetailsCard event={eventDetails} />
+    <main className="relative h-full flex flex-col justify-center lg:flex-row">
+      <Suspense fallback={<EventDetailsLoader />}>
+        <EventDetailsCard event={eventDetails} back={username} />
+      </Suspense>
 
-      <div className="flex flex-col p-8 border bg-background lg:w-2/3">
+      <div className="flex flex-col p-8 border bg-background lg:w-2/3">   
         <Suspense fallback={<BookingLoader />}>
           <BookingForm currentEvent={eventDetails} availability={availabilities} />
         </Suspense>
       </div>
-    </div>
+    </main>
   );
 }
 
-function BookingLoader() {
-  return (
-    <div className="flex flex-col w-full m-auto gap-2 items-center">
-      <BeatLoader size={20} />
-      <p>Loading booking info...</p>
+function EventDetailsLoader() {
+  return <div className="p-10 border lg:w-1/3 bg-secondary">
+    <Skeleton className="h-8 w-full mb-4 mt-2" />
+
+    <div className="flex items-center gap-4">
+      <Skeleton className="h-12 w-12 rounded-full" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[250px]" />
+        <Skeleton className="h-4 w-[200px]" />
+      </div>
     </div>
-  )
+
+    <div className="flex flex-col gap-2 mt-4">
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="aspect-video w-full" />
+    </div>
+  </div>
+}
+
+function BookingLoader() {
+  return <div className="flex flex-col w-full m-auto gap-2 items-center">
+    <BeatLoader size={20} />
+    <p>Loading booking info...</p>
+  </div>
 }
 
 export default EventBookingPage;

@@ -2,24 +2,33 @@
 
 import { EventDetails } from "@/actions/event-details";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { tzString } from "@/constants/constants";
-import { Clock, Globe } from "lucide-react";
+import { ArrowLeft, Clock, Globe } from "lucide-react";
+import Link from "next/link";
 
 interface EventDetailsProps{
-  event: EventDetails
+  event: EventDetails,
+  back: string
 }
 
-export default function EventDetailsCard({event}: EventDetailsProps) {
+export default function EventDetailsCard({event, back}: EventDetailsProps) {
   const {user} = event
 
   return (
-    <div className="p-10 border lg:w-1/3 bg-white">
-      <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
+    <div className="p-10 border lg:w-1/3 bg-secondary">
+      <Button asChild variant="ghost" className="hover:bg-primary-foreground">
+        <Link href={`/${back}`}>
+          <ArrowLeft />
+          <span>Return to events page</span>
+        </Link>
+      </Button>
+      <h1 className="text-3xl font-bold mb-4 mt-2">{event.title}</h1>
 
       <div className="flex items-center mb-4">
         <Avatar className="w-12 h-12 mr-4">
           <AvatarImage className="rounded-full" src={user.imageUrl!} alt={user.name!} />
-          <AvatarFallback className="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-blue-600 rounded-full">
+          <AvatarFallback className="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
             {user.name?.charAt(0)}
           </AvatarFallback>
         </Avatar>
