@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ChevronRight, Sparkle } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { hero } from "../public/locales/en/common.json"
+import { RainbowButton } from "./ui/rainbow-button";
 
 export function HeroSection2() {
   return (
@@ -20,15 +20,12 @@ export function HeroSection2() {
               </p>
 
               <div className="flex items-center justify-center gap-3">
-                <Button
-                  asChild
-                  size="lg"
-                >
+                <RainbowButton asChild size="lg">
                   <Link href="#link">
                     <span className="text-nowrap">{hero.cta}</span>
                     <ChevronRight className="ml-1" />
                   </Link>
-                </Button>
+                </RainbowButton>
               </div>
             </div>
           </div>
