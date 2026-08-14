@@ -4,18 +4,18 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { motion } from "motion/react";
 import {
-  Code,
-  Palette,
-  Rocket,
+  BadgeDollarSign,
+  Drill,
+  PlaneLanding,
 } from "lucide-react";
 import { services } from "../public/locales/en/common.json";
 
 // header icons for each card
-const iconCards = [Code, Palette, Rocket]
+const iconCards = [BadgeDollarSign, PlaneLanding, Drill]
 
 export function ServicesBlock() {
   return (
-    <section className="w-full bg-background px-4 py-16 -mt-8 md:py-24">
+    <section id="services" className="w-full bg-background px-4 py-16 -mt-8 md:py-24">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <motion.div
@@ -48,7 +48,7 @@ export function ServicesBlock() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 whileHover={{ y: -5 }}
               >
-                <Card className="group relative h-full overflow-hidden border-border/50 bg-card p-4 transition-all hover:shadow-xl md:p-6">
+                <Card className="group relative h-full overflow-hidden border-border/50 bg-card p-4 transition-all hover:border-accent hover:shadow-xl md:p-6">
                   {/* Gradient overlay */}
                   <motion.div
                     className={`absolute inset-0 ${service.bgColor} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
@@ -84,7 +84,7 @@ export function ServicesBlock() {
                           transition={{ delay: 0.5 + idx * 0.1 }}
                           className="flex items-center gap-2 text-xs text-muted-foreground"
                         >
-                          <div className={`h-1 w-1 rounded-full bg-primary`} />
+                          <div className={`h-1 w-1 rounded-full bg-muted-foreground`} />
                           {feature}
                         </motion.li>
                       ))}

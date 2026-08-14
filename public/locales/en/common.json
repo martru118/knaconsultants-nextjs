@@ -7,12 +7,12 @@
       "href": "#services"
     },
     {
-      "name": "Testimonials",
-      "href": "#testimonials"
+      "name": "About Us",
+      "href": "#about"
     },
     {
-      "name": "FAQ",
-      "href": "#faq"
+      "name": "Contact",
+      "href": "#contact"
     }
   ],
   "hero": {
@@ -60,15 +60,9 @@
         "title": "Contracting",
         "desc": "Get accepted for loans, leases, and mortgages to launch your business",
         "features": ["React & Next.js", "TypeScript", "Performance Optimized"],
-        "iconColor": "text-red-500",
-        "bgColor": "bg-red-500/10"
+        "iconColor": "text-orange-500",
+        "bgColor": "bg-orange-500/10"
       }
     ]
-  },
-  "testimonial": {
-    "quote": "Schedulrr has transformed how I manage my team's meetings. It's intuitive and saves us hours every week!",
-    "name": "Sarah Johnson",
-    "position": "CEO",
-    "company": "Apple Inc"
   }
 }

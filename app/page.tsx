@@ -6,14 +6,17 @@
   Testimonials https://tailark.com/dusk/testimonials
 */
 
-import { HeroHeader } from "@/components/Navbar";
-import {HeroSection2} from "@/components/HeroSection2";
+import { Navbar } from "@/components/Navbar";
+import { HeroSection2 } from "@/components/HeroSection2";
 import { ServicesBlock } from "@/components/ServicesBlock";
+import { checkUser } from "@/lib/check-user";
 
-export default function Home() {
+export default async function Home() {
+  await checkUser()
+
   return (
     <main className="overflow-x-hidden">
-      <HeroHeader />
+      <Navbar />
       <HeroSection2 />
       <ServicesBlock />
     </main>
