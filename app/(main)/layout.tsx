@@ -26,7 +26,7 @@ function AppLayout({ children }: LayoutProps) {
   return (
     <>
       {!isLoaded && <BarLoader className="min-w-screen" color="#36d7b7" />}
-      <div className="flex flex-col min-h-screen bg-blue-50 md:flex-row">
+      <div className="flex flex-col min-h-screen bg-muted md:flex-row">
         <aside className="hidden md:block w-64 bg-background">
           <nav className="mt-8">
             <ul>
@@ -76,6 +76,9 @@ function AppLayout({ children }: LayoutProps) {
       </nav>
     </>
   );
+}
+function AppSkeleton() {
+  
 }
 
 export default AppLayout;

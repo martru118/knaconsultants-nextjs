@@ -3,15 +3,15 @@
   "metadata": "Consulting for every step of your business",
   "nav": [
     {
-      "name": "Our Services",
+      "title": "Our Services",
       "href": "#services"
     },
     {
-      "name": "About Us",
+      "title": "About Us",
       "href": "#about"
     },
     {
-      "name": "Contact",
+      "title": "Contact",
       "href": "#contact"
     }
   ],
@@ -62,6 +62,48 @@
         "features": ["React & Next.js", "TypeScript", "Performance Optimized"],
         "iconColor": "text-orange-500",
         "bgColor": "bg-orange-500/10"
+      }
+    ]
+  },
+  "profile": {
+    "heading": "Welcome to my scheduling page! Please select an event to book a call with me.",
+    "empty": "No public events available.",
+    "nav": "Return to home"
+  },
+  "booking": {
+    "heading": "Available time slots",
+    "empty": "No time slots available.",
+    "nav": "Return to events page",
+    "action": "Schedule event",
+    "fields": [
+      {
+        "title": "Full name",
+        "hint": "Your full name"
+      },
+      {
+        "title": "Email",
+        "hint": "Your email address"
+      },
+      {
+        "title": "Additional info",
+        "hint": "What would you like to discuss?"
+      }
+    ]
+  },
+  "footer": {
+    "heading": "K & A Consulting Ltd, All rights reserved",
+    "nav": [
+      {
+        "title": "Our Services",
+        "href": "/#services"
+      },
+      {
+        "title": "About Us",
+        "href": "/#about"
+      },
+      {
+        "title": "Contact",
+        "href": "/#contact"
       }
     ]
   }

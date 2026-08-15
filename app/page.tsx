@@ -9,16 +9,15 @@
 import { Navbar } from "@/components/Navbar";
 import { HeroSection2 } from "@/components/HeroSection2";
 import { ServicesBlock } from "@/components/ServicesBlock";
-import { checkUser } from "@/lib/check-user";
+import { Footer } from "@/components/Footer";
 
 export default async function Home() {
-  await checkUser()
-
-  return (
+  return <>
     <main className="overflow-x-hidden">
       <Navbar />
       <HeroSection2 />
       <ServicesBlock />
     </main>
-  );
+    <Footer />
+  </>
 }

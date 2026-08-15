@@ -8,7 +8,7 @@ import {
   Drill,
   PlaneLanding,
 } from "lucide-react";
-import { services } from "../public/locales/en/common.json";
+import { services } from "@/public/locales/en/common.json";
 
 // header icons for each card
 const iconCards = [BadgeDollarSign, PlaneLanding, Drill]

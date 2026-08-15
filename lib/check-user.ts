@@ -2,7 +2,7 @@ import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { db } from "./prisma";
 import { cache } from "react";
 
-export async function checkUser() {
+async function checkUser() {
   const user = await currentUser()
   if (!user) return null
 
@@ -53,6 +53,8 @@ export async function checkUser() {
     console.error(error)
   }
 }
+
+export const cachedUser = cache(checkUser)
 
 export const getOwnership = cache(async (userId: string) => {
   // get current user from db

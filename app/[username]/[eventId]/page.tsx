@@ -7,7 +7,7 @@ import BookingForm from "./_components/booking-form";
 import { cachedEventAvailability } from "@/actions/availability";
 import { BeatLoader } from "react-spinners";
 import { Skeleton } from "@/components/ui/skeleton";
-import { checkUser } from "@/lib/check-user";
+import { Footer } from "@/components/Footer";
 
 interface EventPageProps {
   params: Promise<{username: string, eventId: string}>
@@ -29,8 +29,6 @@ export async function generateMetadata({params}: EventPageProps): Promise<Metada
 }
 
 async function EventBookingPage({params}: EventPageProps) {
-  await checkUser()
-
   // get event details from db
   const {username, eventId} = await params
   const eventDetails = await cachedEventDetails(username, eventId)
@@ -39,7 +37,7 @@ async function EventBookingPage({params}: EventPageProps) {
   // get available timeslots for this event
   const availabilities = await cachedEventAvailability(eventId)
 
-  return (
+  return <>
     <main className="relative h-full flex flex-col justify-center lg:flex-row">
       <Suspense fallback={<EventDetailsLoader />}>
         <EventDetailsCard event={eventDetails} back={username} />
@@ -51,7 +49,8 @@ async function EventBookingPage({params}: EventPageProps) {
         </Suspense>
       </div>
     </main>
-  );
+    <Footer />
+  </>
 }
 
 function EventDetailsLoader() {

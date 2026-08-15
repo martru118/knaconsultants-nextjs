@@ -9,9 +9,9 @@ import { Home } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { profile } from "../../public/locales/en/common.json";
-import { checkUser } from "@/lib/check-user";
+import { profile } from "@/public/locales/en/common.json";
 import { Logo } from "@/components/logo";
+import { Footer } from "@/components/Footer";
 
 interface UserPageProps {
   params: Promise<{username: string}>
@@ -33,63 +33,64 @@ export async function generateMetadata({params}: UserPageProps): Promise<Metadat
 }
 
 async function UserPage({params}: UserPageProps) {
-  await checkUser()
-
   // retrieve username from url
   const {username} = await params
   const user = await cachedUserEvents(username)
   if (!user) return notFound()
 
   return (
-    <main className="relative h-[100vh] overflow-hidden bg-secondary px-4 py-4">
-      <div className="mx-auto pb-8 px-4 flex justify-between items-center">
-        <Button asChild variant="ghost" className="hover:bg-primary-foreground">
-          <Link href="/">
-            <Home />
-            <span>Return to home</span>
-          </Link>
-        </Button>
-
-        <div className="flex items-center gap-4">
-          <SignedOut>
-            <Logo />
-          </SignedOut>
-          <SignedIn>
-            <CreateEventButton />
-            <UserMenu />
-          </SignedIn>
-        </div>
-      </div>
-      <div className="flex flex-col items-center mb-8">
-        <Avatar className="w-24 h-24 mb-4">
-          <AvatarImage className="rounded-full" src={user.imageUrl!} alt={user.name!} />
-          <AvatarFallback className="inline-flex items-center justify-center w-24 h-24 text-7xl text-white font-bold bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
-            {user.name?.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        <h1 className="text-3xl font-bold mb-2">{user.name}</h1>
-        <p className="text-gray-600 text-center">
-          {profile.heading}
-        </p>
-      </div>
-
-      {user.events.length === 0? (
-        <p className="text-gray-600 text-center">{profile.empty}</p>
-      ) : (
-        <div className="container mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {user.events.map((event) => {
-            return <Link key={`${event.id}`} href={`/${username}/${event.id}`}>
-              <EventCard 
-                key={event.id}
-                event={event as any}
-                user={username}
-                isPublic
-              />
+    <>
+      <main className="relative h-[100vh] overflow-hidden bg-secondary px-4 py-4">
+        <div className="mx-auto pb-8 px-4 flex justify-between items-center">
+          <Button asChild variant="ghost" className="hover:bg-primary-foreground">
+            <Link href="/">
+              <Home />
+              <span>{profile.nav}</span>
             </Link>
-          })}
+          </Button>
+
+          <div className="flex items-center gap-4">
+            <SignedOut>
+              <Logo />
+            </SignedOut>
+            <SignedIn>
+              <CreateEventButton />
+              <UserMenu />
+            </SignedIn>
+          </div>
         </div>
-      )}
-    </main>
+        <div className="flex flex-col items-center mb-8">
+          <Avatar className="w-24 h-24 mb-4">
+            <AvatarImage className="rounded-full" src={user.imageUrl!} alt={user.name!} />
+            <AvatarFallback className="inline-flex items-center justify-center w-24 h-24 text-7xl text-white font-bold bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
+              {user.name?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <h1 className="text-3xl font-bold mb-2">{user.name}</h1>
+          <p className="text-gray-600 text-center">
+            {profile.heading}
+          </p>
+        </div>
+
+        {user.events.length === 0? (
+          <p className="text-gray-600 text-center">{profile.empty}</p>
+        ) : (
+          <div className="container mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {user.events.map((event) => {
+              return <Link key={`${event.id}`} href={`/${username}/${event.id}`}>
+                <EventCard 
+                  key={event.id}
+                  event={event as any}
+                  user={username}
+                  isPublic
+                />
+              </Link>
+            })}
+          </div>
+        )}
+      </main>
+      <Footer />
+    </>
   );
 }
 

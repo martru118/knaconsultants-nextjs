@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { tzString } from "@/constants/constants";
 import { ArrowLeft, Clock, Globe } from "lucide-react";
 import Link from "next/link";
+import { booking } from "@/public/locales/en/common.json"
 
 interface EventDetailsProps{
   event: EventDetails,
@@ -20,7 +21,7 @@ export default function EventDetailsCard({event, back}: EventDetailsProps) {
       <Button asChild variant="ghost" className="hover:bg-primary-foreground">
         <Link href={`/${back}`}>
           <ArrowLeft />
-          <span>Return to events page</span>
+          <span>{booking.nav}</span>
         </Link>
       </Button>
       <h1 className="text-3xl font-bold mb-4 mt-2">{event.title}</h1>

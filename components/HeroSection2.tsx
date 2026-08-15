@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { hero } from "../public/locales/en/common.json"
+import { hero } from "@/public/locales/en/common.json"
 import { RainbowButton } from "./ui/rainbow-button";
 
 export function HeroSection2() {

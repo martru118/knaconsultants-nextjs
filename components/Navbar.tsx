@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import CreateEventButton from "@/components/events/CreateEventButton";
 import UserMenu from "./UserMenu";
-import { nav } from "../public/locales/en/common.json"
+import { nav } from "@/public/locales/en/common.json"
 
 export function Navbar() {
   const [menuState, setMenuState] = React.useState(false);
@@ -69,7 +69,7 @@ export function Navbar() {
                         size="sm"
                       >
                         <Link href={item.href} className="text-base">
-                          <span>{item.name}</span>
+                          <span>{item.title}</span>
                         </Link>
                       </Button>
                     </li>
@@ -87,7 +87,7 @@ export function Navbar() {
                         href={item.href}
                         className="text-muted-foreground hover:text-accent-foreground block duration-150"
                       >
-                        <span>{item.name}</span>
+                        <span>{item.title}</span>
                       </Link>
                     </li>
                   ))}

@@ -6,6 +6,7 @@ import { useDayPicker } from "@/hooks/use-daypicker";
 import { addDays } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
+import { booking } from "@/public/locales/en/common.json"
 
 const today = new Date()
 
@@ -20,7 +21,7 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
   const setDate = useDayPicker(state => state.setDate)
   const setTime = useDayPicker(state => state.setTime)
 
-  return <div className="md:h-90 flex flex-col md:flex-row gap-5">
+  return <div className="md:h-90 flex flex-col sm:flex-row gap-5">
     <div className="max-w-full">
       <DayPicker 
         mode="single" 
@@ -51,10 +52,10 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
     <div className="max-w-full h-full mt-2 md:overflow-scroll no-scrollbar">
       <div className="mb-5">
         <h3 className="text-lg font-semibold mb-2">
-          Available time slots
+          {booking.heading}
         </h3>
         {!slots.length && (
-          <p className="text-md">No time slots available.</p>
+          <p className="text-md">{booking.empty}</p>
         )}
         {selectedDate && (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
