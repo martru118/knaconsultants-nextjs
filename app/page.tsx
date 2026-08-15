@@ -12,12 +12,10 @@ import { ServicesBlock } from "@/components/ServicesBlock";
 import { Footer } from "@/components/Footer";
 
 export default async function Home() {
-  return <>
-    <main className="overflow-x-hidden">
-      <Navbar />
-      <HeroSection2 />
-      <ServicesBlock />
-    </main>
+  return <main className="overflow-x-hidden">
+    <Navbar />
+    <HeroSection2 />
+    <ServicesBlock />
     <Footer />
-  </>
+  </main>
 }

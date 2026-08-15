@@ -12,6 +12,7 @@ import { notFound } from "next/navigation";
 import { profile } from "@/public/locales/en/common.json";
 import { Logo } from "@/components/logo";
 import { Footer } from "@/components/Footer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UserPageProps {
   params: Promise<{username: string}>
@@ -40,7 +41,7 @@ async function UserPage({params}: UserPageProps) {
 
   return (
     <>
-      <main className="relative h-[100vh] overflow-hidden bg-secondary px-4 py-4">
+      <main className="relative min-h-screen overflow-hidden bg-secondary px-4 py-4">
         <div className="mx-auto pb-8 px-4 flex justify-between items-center">
           <Button asChild variant="ghost" className="hover:bg-primary-foreground">
             <Link href="/">
@@ -92,6 +93,14 @@ async function UserPage({params}: UserPageProps) {
       <Footer />
     </>
   );
+}
+
+function ProfileSkeleton() {
+  return <div className="container mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <Skeleton className="aspect-video w-full" />
+    <Skeleton className="aspect-video w-full" />
+    <Skeleton className="aspect-video w-full" />
+  </div>
 }
 
 export default UserPage

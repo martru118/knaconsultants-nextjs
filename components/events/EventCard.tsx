@@ -7,6 +7,7 @@ import useFetch from "@/hooks/use-fetch";
 import { deleteEvent, UserEvent } from "@/actions/events";
 import { useCopy } from "@/hooks/use-copy";
 import { useDrawer } from "@/hooks/use-drawer";
+import { motion } from "motion/react";
 
 interface CardProps {
   event: UserEvent,
@@ -18,20 +19,26 @@ function EventCard({event, user, isPublic=false}: CardProps) {
   if (isPublic) {
     // public event cards to be shown in user page
     return (
-      <Card className="flex flex-col h-full justify-between cursor-pointer">
-        <CardHeader>
-          <CardTitle className="text-xl line-clamp-3">{event.title}</CardTitle>
-          <CardDescription className="flex justify-between">
-            <span>
-              {event.duration} mins
-            </span>
-            <span>{event._count.bookings} Bookings</span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="line-clamp-5">{event.description}</p>
-        </CardContent>
-      </Card>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -5 }}
+      >
+        <Card className="flex flex-col h-full justify-between cursor-pointer">
+          <CardHeader>
+            <CardTitle className="text-xl line-clamp-3">{event.title}</CardTitle>
+            <CardDescription className="flex justify-between">
+              <span>
+                {event.duration} mins
+              </span>
+              <span>{event._count.bookings} Bookings</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="line-clamp-5">{event.description}</p>
+          </CardContent>
+        </Card>
+      </motion.div>
     )
   } else {
     // show all event cards in dashboard 
