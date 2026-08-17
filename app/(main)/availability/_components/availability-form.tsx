@@ -2,7 +2,7 @@
 "use client";
 
 import { Controller, Form, useForm } from "react-hook-form";
-import { DAYS_OF_WEEK_IN_ORDER, defaultAvailability } from "../../../../constants/constants";
+import { DAYS_OF_WEEK_IN_ORDER, defaultAvailability } from "@/constants/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { availabilitySchema } from "@/lib/validators";
 import { Checkbox } from "@/components/ui/checkbox";

@@ -5,6 +5,7 @@ import {
   DAYS_OF_WEEK_IN_ORDER,
   defaultAvailability,
 } from "@/constants/constants";
+import { converttoUTC } from "@/lib/helper";
 import { db } from "@/lib/prisma";
 import { createSafeAction } from "@/lib/safe-action";
 import { availabilitySchema } from "@/lib/validators";
@@ -17,7 +18,6 @@ import {
   parseISO,
   startOfDay,
 } from "date-fns";
-import { revalidatePath } from "next/cache";
 import { cache } from "react";
 
 export async function getUserAvailability() {
@@ -116,8 +116,6 @@ export const updateAvailability = createSafeAction(
         },
       });
     }
-
-    revalidatePath("/[username]/[eventId]", "page")
   }
 )
 
@@ -172,11 +170,26 @@ async function getEventAvailability(eventId: string) {
         dayAvailability.endTime,
         event.duration,
         bookings,
-        dateStr,
-        availability.timeGap
+        dateStr
       );
 
       availableDates[dateStr] = slots
+    }
+  }
+
+  // check if time gap is after first meeting
+  const today = format(new Date(), dateFormat);
+  const slotsToday = availableDates[today]
+
+  if (availableDates[today]) {
+    // get current time with gap
+    const firstSlot = converttoUTC(slotsToday[0], today)
+    const timeWithGap = addMinutes(new Date(), availability.timeGap)
+
+    // remove first time if conflicting with time gap
+    if (isAfter(timeWithGap, firstSlot)) {
+      slotsToday.shift()
+      availableDates[today] = slotsToday
     }
   }
 
@@ -194,12 +207,10 @@ function generateAvailableTimeslots(
     endTime: Date;
   }[],
   dateStr: string,
-  timeGap: number = 0
 ) {
   const slots = [];
   let firstTime = parseISO(`${dateStr}T${startTime.toISOString().slice(11, 16)}`);
   const secondTime = parseISO(`${dateStr}T${endTime.toISOString().slice(11, 16)}`);
-  const timeWithGap = addMinutes(firstTime, timeGap)
 
   while (firstTime < secondTime) {
     const slotEnd = new Date(firstTime.getTime() + duration * 60000);
@@ -221,7 +232,7 @@ function generateAvailableTimeslots(
     });
 
     // push all available timeslots
-    if (isSlotAvailable && isAfter(timeWithGap, new Date())) slots.push(format(firstTime, "p"));
+    if (isSlotAvailable && isAfter(firstTime, new Date())) slots.push(format(firstTime, "p"));
     firstTime = slotEnd;
   }
 
