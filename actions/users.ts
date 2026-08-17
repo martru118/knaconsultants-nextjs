@@ -65,3 +65,15 @@ async function getUserEvents(username: string) {
 }
 
 export const cachedUserEvents = cache(getUserEvents)
+
+export async function getProfileUsername(email: string) {
+  // fetch username by email
+  const user = await db.user.findFirst({
+    where: { email },
+    select: {
+      username: true,
+    }
+  })
+
+  return user?.username ?? null
+}

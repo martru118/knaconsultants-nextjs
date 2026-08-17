@@ -10,16 +10,16 @@ import { booking } from "@/public/locales/en/common.json"
 
 interface EventDetailsProps{
   event: EventDetails,
-  back: string
+  cancel: string  // cancel action returns to user page
 }
 
-export default function EventDetailsCard({event, back}: EventDetailsProps) {
+export default function EventDetailsCard({event, cancel}: EventDetailsProps) {
   const {user} = event
 
   return (
     <div className="p-10 border lg:w-1/3 bg-secondary">
       <Button asChild variant="ghost" className="hover:bg-primary-foreground">
-        <Link href={`/${back}`}>
+        <Link href={`/${cancel}`}>
           <ArrowLeft />
           <span>{booking.nav}</span>
         </Link>

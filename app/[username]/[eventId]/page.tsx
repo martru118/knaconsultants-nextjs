@@ -9,11 +9,11 @@ import { BeatLoader } from "react-spinners";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/Footer";
 
-interface EventPageProps {
+interface PageProps {
   params: Promise<{username: string, eventId: string}>
 }
 
-export async function generateMetadata({params}: EventPageProps): Promise<Metadata> {
+export async function generateMetadata({params}: PageProps): Promise<Metadata> {
   const {username, eventId} = await params
   const event = await cachedEventDetails(username, eventId)
 
@@ -28,7 +28,7 @@ export async function generateMetadata({params}: EventPageProps): Promise<Metada
   }
 }
 
-async function EventBookingPage({params}: EventPageProps) {
+async function EventBookingPage({params}: PageProps) {
   // get event details from db
   const {username, eventId} = await params
   const eventDetails = await cachedEventDetails(username, eventId)
@@ -40,7 +40,7 @@ async function EventBookingPage({params}: EventPageProps) {
   return <>
     <main className="relative h-full flex flex-col justify-center lg:flex-row">
       <Suspense fallback={<EventDetailsLoader />}>
-        <EventDetailsCard event={eventDetails} back={username} />
+        <EventDetailsCard event={eventDetails} cancel={username} />
       </Suspense>
 
       <div className="flex flex-col p-8 border bg-background lg:w-2/3">   

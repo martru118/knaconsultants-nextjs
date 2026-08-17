@@ -1,57 +1,51 @@
+"use client"
+
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { hero } from "../public/locales/en/common.json"
+import { hero } from "@/public/locales/en/common.json"
+import { RainbowButton } from "./ui/rainbow-button";
+import { useProfileStore } from "@/hooks/use-profile";
 
-export default function HeroSection() {
+export function HeroSection() {
+  const userProfile = useProfileStore(state => state.profile)
+
   return (
-    <>
-      {/* Hero section */}
-      <section>
-        <div>
-          <div className="aspect-2/3 relative z-10 flex flex-col justify-end px-6 lg:aspect-video">
-            <div className="mx-auto w-full max-w-7xl pb-6 lg:px-12 lg:pb-32">
-              <div className="max-w-xl">
-                <h1 className="text-balance font-semibold text-5xl md:text-6xl xl:text-7xl">
-                  {hero.heading}
-                </h1>
-                <p className="mt-6 text-balance text-lg">{hero.subheading}</p>
+    <main>
+      <section className="before:bg-muted border-e-foreground relative overflow-hidden before:absolute before:inset-1 before:h-[calc(100%-8rem)] before:rounded-2xl sm:before:inset-2 md:before:rounded-[2rem] lg:before:h-[calc(100%-14rem)]">
+        <div className="py-20 md:py-36">
+          <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
+            <div>
+              <h1 className="mx-auto mt-8 max-w-3xl text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                {hero.heading}
+              </h1>
+              <p className="text-muted-foreground mx-auto my-6 max-w-xl text-balance text-xl">
+                {hero.subheading}
+              </p>
 
-                <div className="mt-8 flex items-center gap-2">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="h-12 rounded-full pl-5 pr-3 text-base"
-                  >
-                    <Link href="#link">
-                      <span className="text-nowrap">{hero.cta}</span>
-                      <ChevronRight className="ml-1" />
-                    </Link>
-                  </Button>
+              <div className="flex items-center justify-center gap-3">
+                <RainbowButton asChild size="lg">
+                  <Link href={`/${userProfile}`}>
+                    <span className="text-nowrap">{hero.cta}</span>
+                    <ChevronRight className="ml-1" />
+                  </Link>
+                </RainbowButton>
+              </div>
+            </div>
+          </div>
+          <div className="relative">
+            <div className="relative z-10 mx-auto max-w-5xl px-6">
+              <div className="mt-12 md:mt-16">
+                <div className="bg-background rounded-(--radius) relative mx-auto overflow-hidden border border-transparent shadow-lg shadow-black/10 ring-1 ring-black/10">
+                  <img
+                    className="size-full -scale-x-100 object-cover bg-black"
+                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  />
                 </div>
               </div>
             </div>
           </div>
-          <div className="aspect-2/3 pointer-events-none absolute inset-1 overflow-hidden rounded-3xl border border-black/10 lg:aspect-video lg:rounded-[3rem] dark:border-white/5">
-            <img
-              className="size-full -scale-x-100 object-cover bg-black opacity-40"
-              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            />
-          </div>
         </div>
       </section>
-
-      {/* Stats section */}
-      <section className="bg-background py-6">
-        <div className="grid divide-y *:text-center md:grid-cols-3 md:gap-2 md:divide-x md:divide-y-0">
-          {hero.stats.map((stat, index) => (
-            <div className="space-y-1" key={index}>
-              <div className="text-2xl font-bold gradient-title">{stat.number}</div>
-              <p>{stat.caption}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </>
+    </main>
   );
 }

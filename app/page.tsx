@@ -7,14 +7,14 @@
 */
 
 import { Navbar } from "@/components/Navbar";
-import { HeroSection2 } from "@/components/HeroSection2";
+import { HeroSection } from "@/components/HeroSection";
 import { ServicesBlock } from "@/components/ServicesBlock";
 import { Footer } from "@/components/Footer";
 
-export default async function Home() {
+export default function Home() {
   return <main className="overflow-x-hidden">
     <Navbar />
-    <HeroSection2 />
+    <HeroSection />
     <ServicesBlock />
     <Footer />
   </main>
