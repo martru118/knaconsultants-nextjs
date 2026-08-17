@@ -7,6 +7,8 @@ import { tzString } from "@/constants/constants";
 import { ArrowLeft, Clock, Globe } from "lucide-react";
 import Link from "next/link";
 import { booking } from "@/public/locales/en/common.json"
+import { useDayPicker } from "@/hooks/use-daypicker";
+import { useEffect } from "react";
 
 interface EventDetailsProps{
   event: EventDetails,
@@ -14,7 +16,11 @@ interface EventDetailsProps{
 }
 
 export default function EventDetailsCard({event, cancel}: EventDetailsProps) {
+  const setEventInfo = useDayPicker(state => state.setEventInfo)
   const {user} = event
+
+  // initialize booking data
+  useEffect(() => setEventInfo(event), [])
 
   return (
     <div className="p-10 border lg:w-1/3 bg-secondary">

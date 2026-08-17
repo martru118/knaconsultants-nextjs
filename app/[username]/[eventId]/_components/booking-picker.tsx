@@ -21,7 +21,7 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
   const setDate = useDayPicker(state => state.setDate)
   const setTime = useDayPicker(state => state.setTime)
 
-  return <div className="md:h-90 flex flex-col sm:flex-row gap-5">
+  return <div className="md:h-90 flex flex-col md:flex-row gap-5">
     <div className="max-w-full">
       <DayPicker 
         mode="single" 
@@ -58,7 +58,7 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
           <p className="text-md">{booking.empty}</p>
         )}
         {selectedDate && (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {slots.map(slot => {
               return (                  
                 <Button 

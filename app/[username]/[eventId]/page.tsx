@@ -45,7 +45,7 @@ async function EventBookingPage({params}: PageProps) {
 
       <div className="flex flex-col p-8 border bg-background lg:w-2/3">   
         <Suspense fallback={<BookingLoader />}>
-          <BookingForm currentEvent={eventDetails} availability={availabilities} />
+          <BookingForm availability={availabilities} />
         </Suspense>
       </div>
     </main>

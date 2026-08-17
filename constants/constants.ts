@@ -20,6 +20,15 @@ export const DAYS_OF_WEEK_IN_ORDER = [
   "sunday",
 ] as const
 
+// booking form selector schema
+export const spokenLanguages = [
+  { label: "English", value: "en" },
+  { label: "Cantonese (粵語)", value: "zh-yue" },
+  { label: "Mandarin (普通話)", value: "zh" },
+  { label: "Vietnamese (Tiếng Việt)", value: "vi" },
+] as const
+
+// constant strings
 export const dateFormat = "yyyy-MM-dd" as const
 export const tzString = "America/Toronto" as const
 export const domain = "localhost:3000" as const

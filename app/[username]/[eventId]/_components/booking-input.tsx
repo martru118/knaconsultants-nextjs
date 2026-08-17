@@ -2,18 +2,20 @@
 
 import { createBooking } from "@/actions/bookings";
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { spokenLanguages } from "@/constants/constants";
 import { useDayPicker } from "@/hooks/use-daypicker";
 import useFetch from "@/hooks/use-fetch";
-import { bookingSchema } from "@/lib/validators";
+import { bookingSchema, BookingSchemaType } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { parse } from "date-fns/parse";
-import { useForm } from "react-hook-form";
-import z from "zod";
+import { CalendarDays } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
 
 interface BookingInterface {
   dateKey: string,  // selected date as booking key
@@ -23,7 +25,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
   // disable form if no time is selected
   const selectedDate = useDayPicker(state => state.selectedDate)
   const selectedTime = useDayPicker(state => state.selectedTime)
-  const currentlyBooking = useDayPicker(state => state.currentlyBooking)
+  const eventInfo = useDayPicker(state => state.eventInfo)
   const isDisabled = !selectedTime
 
   const {
@@ -35,13 +37,17 @@ export function BookingInput({ dateKey }: BookingInterface) {
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors },
-  } = useForm<z.infer<typeof bookingSchema>>({
+  } = useForm<BookingSchemaType>({
     resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      language: "en"
+    }
   });
 
   // validate full schema on submit
-  async function onSubmit(data: z.infer<typeof bookingSchema>) {
+  async function onSubmit(data: BookingSchemaType) {
     if (!selectedDate || !selectedTime) {
       setError("root", { message: "Date or time not selected" })
       return
@@ -53,11 +59,11 @@ export function BookingInput({ dateKey }: BookingInterface) {
 
     // format start and end times
     const startTime = new Date(`${dateKey}T${formattedTime}`)
-    const endTime = new Date(startTime.getTime() + currentlyBooking!.duration*60000)
+    const endTime = new Date(startTime.getTime() + eventInfo!.duration*60000)
 
     // prepare booking data object
     const bookingData = {
-      eventId: currentlyBooking!.id,
+      eventId: eventInfo!.id,
       name: data.name,
       email: data.email,
       startTime,
@@ -78,10 +84,11 @@ export function BookingInput({ dateKey }: BookingInterface) {
   }
 
   return <form className="pt-10 max-w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-    <FieldGroup>
+    <FieldGroup className="-space-y-4">
+      {/* Name field */}
       <Field>
         <FieldLabel htmlFor="attendee-name">
-          Name <span className="text-destructive">*</span>
+          Full name <span className="text-destructive">*</span>
         </FieldLabel>
         <Input id="attendee-name"
           {...register("name")} 
@@ -91,17 +98,71 @@ export function BookingInput({ dateKey }: BookingInterface) {
           className="-mt-2"
         />
       </Field>
-      <Field className="-mt-4">
-        <FieldLabel htmlFor="attendee-email">
-          Email <span className="text-destructive">*</span>
-        </FieldLabel>
-        <Input id="attendee-email"
-          {...register("email")} 
-          type="email" 
-          placeholder="Your email"
-          required
-          disabled={isDisabled}
-          className="-mt-2"
+      <div className="grid grid-cols-2 gap-2">
+        {/* Email field */}
+        <Field>
+          <FieldLabel htmlFor="attendee-email">
+            Email <span className="text-destructive">*</span>
+          </FieldLabel>
+          <Input id="attendee-email"
+            {...register("email")} 
+            type="email" 
+            placeholder="Your email"
+            required
+            disabled={isDisabled}
+            className="-mt-2"
+          />
+        </Field>
+
+        {/* Phone number field */}
+        <Field>
+          <FieldLabel htmlFor="attendee-phone">
+            Phone <span className="text-destructive">*</span>
+          </FieldLabel>
+          <Input id="attendee-phone"
+            {...register("phone")} 
+            placeholder="Your phone number"
+            required
+            disabled={isDisabled}
+            className="-mt-2"
+          />
+        </Field>
+      </div>
+
+      {/* Language picker field */}
+      <Field>
+        <FieldLabel htmlFor="select-language">Spoken language</FieldLabel>
+        <FieldDescription className="-mt-3 -mb-2">
+          For best results, select the language you speak.
+        </FieldDescription>
+        <Controller 
+          name="language" 
+          control={control}
+          render={( { field }) => (
+            <Select
+              disabled={isDisabled}
+              name={field.name}
+              value={field.value}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger
+                id="select-language"
+                className="min-w-[120px]"
+              >
+                <SelectValue placeholder="Select a language" />
+              </SelectTrigger>
+              <SelectContent position="item-aligned">
+                <SelectGroup>
+                  {spokenLanguages.map(locale => (
+                    // map locale to language label for selector
+                    <SelectItem key={locale.value} value={locale.value}>
+                      {locale.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
         />
       </Field>
     </FieldGroup>
@@ -117,14 +178,24 @@ export function BookingInput({ dateKey }: BookingInterface) {
 
     {!isDisabled && <p>You have selected {dateKey} at {selectedTime}</p>}
     <div id="booking-submit" className="flex flex-col">
-      <Button 
-        type="submit"
-        disabled={loading || isDisabled}
-        className="w-full"
-      >
-        {loading? <Spinner data-icon="inline-start" /> : null}
-        Schedule event
-      </Button>
+      <div className="grid grid-cols-2 gap-2">
+        <Button 
+          type="submit"
+          disabled={loading || isDisabled}
+          className="w-full"
+        >
+          {loading? <Spinner data-icon="inline-start" /> : <CalendarDays data-icon="inline-start" />}
+          Schedule event
+        </Button>
+        <Button 
+          type="button"
+          variant="secondary"
+          disabled={loading}
+          className="w-full"
+        >
+          Cancel
+        </Button>
+      </div>
       {errors && (
         <p className="text-destructive text-sm mt-2">{errors.root?.message}</p>
       )}

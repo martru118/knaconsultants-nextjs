@@ -7,8 +7,8 @@ interface DayPickerStore {
   setDate: (date: Date) => void,
   setTime: (time?: string) => void,
 
-  currentlyBooking?: EventDetails | null,
-  setBooking: (event: EventDetails) => void
+  eventInfo?: EventDetails | null,
+  setEventInfo: (event: EventDetails) => void
 }
 
 export const useDayPicker = create<DayPickerStore>(set => ({
@@ -17,6 +17,7 @@ export const useDayPicker = create<DayPickerStore>(set => ({
   setDate: (date) => set({ selectedDate: date }),
   setTime: (time) => set({ selectedTime: time }),
   
-  currentlyBooking: null,
-  setBooking: (event: EventDetails) => set({ currentlyBooking: event })
+  // booking data state
+  eventInfo: null,
+  setEventInfo: (event: EventDetails) => set({ eventInfo: event })
 }))

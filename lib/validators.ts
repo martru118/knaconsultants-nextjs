@@ -62,6 +62,10 @@ export const dayPickerSchema = z.object({
 export const bookingInputSchema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.email("Invalid email"),
+  phone: z.string().regex(/^(\+1)?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, "Invalid phone number"),
+  language: z
+    .string()
+    .min(2, "Please select your preferred language"),
   additionalInfo: z.string().max(500, "Must be 500 characters or less").optional(),
 })
 

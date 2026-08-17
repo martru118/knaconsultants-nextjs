@@ -16,14 +16,12 @@ import { BookingDayPicker } from "./booking-picker";
 import { BookingInput } from "./booking-input";
 
 interface BookingFormProps {
-  currentEvent: EventDetails,
   availability: Record<string, string[]>
 }
 
-function BookingForm({ currentEvent, availability }: BookingFormProps) {
+function BookingForm({ availability }: BookingFormProps) {
   const selectedDate = useDayPicker(state => state.selectedDate)
   const selectedTime = useDayPicker(state => state.selectedTime)
-  const setBooking = useDayPicker(state => state.setBooking)
 
   const {
     setValue,
@@ -33,7 +31,6 @@ function BookingForm({ currentEvent, availability }: BookingFormProps) {
 
   //initialize booking payload
   const { data } = useFetch(createBooking)
-  useMemo(() => setBooking(currentEvent), [])
 
   // fetch all available dates
   const dateKey = format(selectedDate, dateFormat)
