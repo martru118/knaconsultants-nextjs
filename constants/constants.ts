@@ -22,3 +22,5 @@ export const DAYS_OF_WEEK_IN_ORDER = [
 
 export const dateFormat = "yyyy-MM-dd" as const
 export const tzString = "America/Toronto" as const
+export const domain = "localhost:3000" as const
+export const emailAddress = "martru118@gmail.com" as const
