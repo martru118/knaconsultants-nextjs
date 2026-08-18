@@ -10,11 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { spokenLanguages } from "@/constants/constants";
 import { useDayPicker } from "@/hooks/use-daypicker";
 import useFetch from "@/hooks/use-fetch";
+import { converttoUTC } from "@/lib/helper";
 import { bookingSchema, BookingSchemaType } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { parse } from "date-fns/parse";
 import { CalendarDays } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
 interface BookingInterface {
@@ -22,16 +22,20 @@ interface BookingInterface {
 }
 
 export function BookingInput({ dateKey }: BookingInterface) {
-  // disable form if no time is selected
   const selectedDate = useDayPicker(state => state.selectedDate)
   const selectedTime = useDayPicker(state => state.selectedTime)
-  const eventInfo = useDayPicker(state => state.eventInfo)
-  const isDisabled = !selectedTime
+  const duration = useDayPicker(state => state.duration)
 
+  // handle form cancellation
+  const {username, eventId} = useParams()
+  const router = useRouter()
+
+  // disable form if time has not been selected
   const {
     loading, 
     error: e,
   } = useFetch(createBooking)
+  const isDisabled = !selectedTime || loading
 
   const {
     register,
@@ -53,17 +57,13 @@ export function BookingInput({ dateKey }: BookingInterface) {
       return
     }
 
-    // format am/pm time to utc
-    const ampm = parse(selectedTime, "hh:mm a", new Date())
-    const formattedTime = format(ampm, "HH:mm")
-
-    // format start and end times
-    const startTime = new Date(`${dateKey}T${formattedTime}`)
-    const endTime = new Date(startTime.getTime() + eventInfo!.duration*60000)
+    // format start and end times to utc
+    const startTime = converttoUTC(selectedTime, dateKey)
+    const endTime = new Date(startTime.getTime() + duration*60000)
 
     // prepare booking data object
     const bookingData = {
-      eventId: eventInfo!.id,
+      eventId: eventId!.toString(),
       name: data.name,
       email: data.email,
       startTime,
@@ -181,7 +181,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
       <div className="grid grid-cols-2 gap-2">
         <Button 
           type="submit"
-          disabled={loading || isDisabled}
+          disabled={isDisabled}
           className="w-full"
         >
           {loading? <Spinner data-icon="inline-start" /> : <CalendarDays data-icon="inline-start" />}
@@ -192,6 +192,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
           variant="secondary"
           disabled={loading}
           className="w-full"
+          onClick={() => router.push(`/${username}`)}
         >
           Cancel
         </Button>

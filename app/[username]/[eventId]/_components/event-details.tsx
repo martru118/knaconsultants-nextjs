@@ -9,23 +9,24 @@ import Link from "next/link";
 import { booking } from "@/public/locales/en/common.json"
 import { useDayPicker } from "@/hooks/use-daypicker";
 import { useEffect } from "react";
+import { useParams } from "next/navigation";
 
-interface EventDetailsProps{
+interface EventDetailsProps {
   event: EventDetails,
-  cancel: string  // cancel action returns to user page
 }
 
-export default function EventDetailsCard({event, cancel}: EventDetailsProps) {
-  const setEventInfo = useDayPicker(state => state.setEventInfo)
+export default function EventDetailsCard({event}: EventDetailsProps) {
+  const setDuration = useDayPicker(state => state.setDuration)
+  const {username} = useParams()
   const {user} = event
 
-  // initialize booking data
-  useEffect(() => setEventInfo(event), [])
+  // set initial event duration
+  useEffect(() => setDuration(event.duration), [])
 
   return (
     <div className="p-10 border lg:w-1/3 bg-secondary">
       <Button asChild variant="ghost" className="hover:bg-primary-foreground">
-        <Link href={`/${cancel}`}>
+        <Link href={`/${username}`}>
           <ArrowLeft />
           <span>{booking.nav}</span>
         </Link>

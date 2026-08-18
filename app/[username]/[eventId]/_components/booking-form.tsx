@@ -1,6 +1,5 @@
 "use client"
 
-import { EventDetails } from "@/actions/event-details";
 import { dayPickerSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";

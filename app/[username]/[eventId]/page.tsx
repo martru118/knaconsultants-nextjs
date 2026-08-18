@@ -40,7 +40,7 @@ async function EventBookingPage({params}: PageProps) {
   return <>
     <main className="relative h-full flex flex-col justify-center lg:flex-row">
       <Suspense fallback={<EventDetailsLoader />}>
-        <EventDetailsCard event={eventDetails} cancel={username} />
+        <EventDetailsCard event={eventDetails} />
       </Suspense>
 
       <div className="flex flex-col p-8 border bg-background lg:w-2/3">   

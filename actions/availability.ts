@@ -173,7 +173,8 @@ async function getEventAvailability(eventId: string) {
         dateStr
       );
 
-      availableDates[dateStr] = slots
+      // add to record when timeslots are found
+      if (slots.length) availableDates[dateStr] = slots
     }
   }
 
@@ -181,7 +182,7 @@ async function getEventAvailability(eventId: string) {
   const today = format(new Date(), dateFormat);
   const slotsToday = availableDates[today]
 
-  if (availableDates[today]) {
+  if (slotsToday && slotsToday.length) {
     // get current time with gap
     const firstSlot = converttoUTC(slotsToday[0], today)
     const timeWithGap = addMinutes(new Date(), availability.timeGap)
@@ -189,7 +190,13 @@ async function getEventAvailability(eventId: string) {
     // remove first time if conflicting with time gap
     if (isAfter(timeWithGap, firstSlot)) {
       slotsToday.shift()
-      availableDates[today] = slotsToday
+      
+      // check if there are no more timeslots
+      if (!slotsToday.length) {
+        delete availableDates[today]
+      } else {
+        availableDates[today] = slotsToday
+      }
     }
   }
 
