@@ -15,22 +15,22 @@ const meetingSchema = z.object({
 })
 
 export async function createBooking(bookingData: z.infer<typeof meetingSchema>) {
+  // validate incoming data
+  const {success, data: meetingData} = meetingSchema.safeParse(bookingData)
+  if (!success) throw new Error("Invalid data")
+
+  // get event info from db
+  const event = await db.event.findUnique({
+    where: {
+      id: meetingData.eventId,
+    },
+    include: {
+      user: true
+    }
+  })
+  if (!event) throw new Error("Event not found")
+
   try {
-    // validate incoming data
-    const {success, data: meetingData} = meetingSchema.safeParse(bookingData)
-    if (!success) throw new Error("Invalid data")
-
-    // get event info from db
-    const event = await db.event.findUnique({
-      where: {
-        id: meetingData.eventId,
-      },
-      include: {
-        user: true
-      }
-    })
-    if (!event) throw new Error("Event not found")
-
     // get oauth client
     const oauthClient = await getOauthClient(event.user.clerkUserId)
     const bookingStart = meetingData.startTime

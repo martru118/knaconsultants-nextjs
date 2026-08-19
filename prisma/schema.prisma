@@ -48,13 +48,19 @@ model Booking {
   userId         String
   user           User    @relation("UserBookings", fields: [userId], references: [id])
   
+  // booking info
   name           String
   email          String
+  phoneNumber    String
+  language       String
   additionalInfo String?
   startTime      DateTime
   endTime        DateTime
+
+  // Google Calendar related
   meetLink       String
   googleEventId  String
+  
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
