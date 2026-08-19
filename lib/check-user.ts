@@ -2,33 +2,14 @@ import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { db } from "./prisma";
 import { cache } from "react";
 
-async function checkUser() {
+export async function checkUser() {
   const user = await currentUser()
-  if (!user) return null
+  if (!user) throw new Error("Unauthorized")
 
   try {
-    // user is logged in
+    // user already exists
     const loggedInUser = await getOwnership(user.id)
-    
-    if (loggedInUser) {
-      // sync changes between Clerk and db
-      if (loggedInUser.name !== user.fullName || loggedInUser.imageUrl !== user.imageUrl) {
-        const syncedUser = await db.user.update({
-          where: {
-            clerkUserId: user.id,
-          },
-          data: {
-            name: user.fullName,
-            imageUrl: user.imageUrl
-          }
-        })
-
-        return syncedUser
-      }
-
-      // current user session
-      return loggedInUser
-    }
+    if (loggedInUser) return loggedInUser
 
     // generate dummy username based on slug
     const name = `${user.firstName} ${user.lastName}`;
@@ -38,7 +19,7 @@ async function checkUser() {
     })
 
     // add new user to database
-    const newUser = await db.user.create({
+    await db.user.create({
       data: {
         clerkUserId: user.id,
         name,
@@ -47,14 +28,10 @@ async function checkUser() {
         username: slug,
       }
     })
-
-    return newUser
-  } catch (error) {
-    console.error(error)
+  } catch (error: any) {
+    throw new Error(`Problem creating user: ${error.message}`)
   }
 }
-
-export const cachedUser = cache(checkUser)
 
 export const getOwnership = cache(async (userId: string) => {
   // get current user from db

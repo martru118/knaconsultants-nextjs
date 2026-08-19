@@ -134,8 +134,10 @@ function ActionButton() {
       */}
     </SignedOut>
     <SignedIn>
-      <CreateEventButton />
-      <UserMenu />
+      <div className="flex flex-row space-x-2 justify-between">
+        <CreateEventButton />
+        <UserMenu />
+      </div>
     </SignedIn>
   </div>
 }

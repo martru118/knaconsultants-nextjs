@@ -1,11 +1,10 @@
+"use client"
+
 import { LogoIcon } from "@/components/logo";
-import { cachedUser } from "@/lib/check-user";
 import Link from "next/link";
 import { footer } from "@/public/locales/en/common.json"
 
-export async function Footer() {
-  await cachedUser()
-
+export function Footer() {
   return (
     <footer className="bg-background border-b py-8">
       <div className="mx-auto max-w-5xl px-6">
