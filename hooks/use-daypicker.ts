@@ -1,4 +1,3 @@
-import { EventDetails } from "@/actions/event-details";
 import { create } from "zustand";
 
 interface DayPickerStore {

@@ -51,8 +51,6 @@ model Booking {
   // booking info
   name           String
   email          String
-  phoneNumber    String
-  language       String
   additionalInfo String?
   startTime      DateTime
   endTime        DateTime

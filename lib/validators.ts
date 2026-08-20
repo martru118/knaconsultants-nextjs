@@ -54,20 +54,28 @@ export const availabilitySchema = z.object({
 });
 
 // booking form schemas
-export const dayPickerSchema = z.object({
+const dayPickerSchema = z.object({
   date: z.iso.date("Invalid date format"),
   time: z.string().regex(/^\b((1[0-2]|0?[1-9]):([0-5][0-9]) ([AaPp][Mm]))$/, "Invalid time format"),
 })
 
-export const bookingInputSchema = z.object({
-  name: z.string().min(2, "Name is required"),
+const bookingInputSchema = z.object({
+  name: z.string().min(2, "Name is required").max(50, "Invalid name format"),
   email: z.email("Invalid email"),
-  phone: z.string().regex(/^(\+1)?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, "Invalid phone number"),
-  language: z
-    .string()
-    .min(2, "Please select your preferred language"),
   additionalInfo: z.string().max(500, "Must be 500 characters or less").optional(),
 })
 
 export const bookingSchema = dayPickerSchema.extend(bookingInputSchema.shape)
 export type BookingSchemaType = z.infer<typeof bookingSchema>
+
+// Google Calendar events schema
+export const meetingSchema = z.object({
+  eventId: z.uuid(),
+  name: z.string(),
+  email: z.email(),
+  startTime: z.date("Invalid date format"),
+  endTime: z.date("Invalid date format"),
+  additionalInfo: z.string().optional(),
+})
+
+export type MeetingSchemaType = z.infer<typeof meetingSchema>

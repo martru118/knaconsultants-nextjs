@@ -2,19 +2,10 @@
 
 import { getOauthClient } from "@/lib/check-oauth";
 import { db } from "@/lib/prisma";
+import { meetingSchema, MeetingSchemaType } from "@/lib/validators";
 import { google } from "googleapis";
-import z from "zod";
 
-const meetingSchema = z.object({
-  eventId: z.uuid(),
-  name: z.string(),
-  email: z.email(),
-  startTime: z.date("Invalid date format"),
-  endTime: z.date("Invalid date format"),
-  additionalInfo: z.string().optional(),
-})
-
-export async function createBooking(bookingData: z.infer<typeof meetingSchema>) {
+export async function createBooking(bookingData: MeetingSchemaType) {
   // validate incoming data
   const {success, data: meetingData} = meetingSchema.safeParse(bookingData)
   if (!success) throw new Error("Invalid data")

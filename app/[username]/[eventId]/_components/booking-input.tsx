@@ -2,27 +2,25 @@
 
 import { createBooking } from "@/actions/bookings";
 import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { spokenLanguages } from "@/constants/constants";
 import { useDayPicker } from "@/hooks/use-daypicker";
 import useFetch from "@/hooks/use-fetch";
 import { converttoUTC } from "@/lib/helper";
 import { bookingSchema, BookingSchemaType } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarDays } from "lucide-react";
+import { Asterisk, CalendarDays } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { FieldErrors, useForm } from "react-hook-form";
 
 interface BookingInterface {
   dateKey: string,  // selected date as booking key
 }
 
 export function BookingInput({ dateKey }: BookingInterface) {
-  const selectedDate = useDayPicker(state => state.selectedDate)
   const selectedTime = useDayPicker(state => state.selectedTime)
   const duration = useDayPicker(state => state.duration)
 
@@ -40,19 +38,24 @@ export function BookingInput({ dateKey }: BookingInterface) {
   const {
     register,
     handleSubmit,
+    setValue,
     setError,
-    control,
     formState: { errors },
   } = useForm<BookingSchemaType>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      language: "en"
+      date: dateKey,
     }
   });
 
+  // manually validate selected time
+  useEffect(() => {
+    if (selectedTime) setValue("time", selectedTime)
+  }, [selectedTime])
+
   // validate full schema on submit
   async function onSubmit(data: BookingSchemaType) {
-    if (!selectedDate || !selectedTime) {
+    if (!dateKey || !selectedTime) {
       setError("root", { message: "Date or time not selected" })
       return
     }
@@ -63,7 +66,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
 
     // prepare booking data object
     const bookingData = {
-      eventId: eventId!.toString(),
+      eventId: eventId,
       name: data.name,
       email: data.email,
       startTime,
@@ -71,7 +74,6 @@ export function BookingInput({ dateKey }: BookingInterface) {
       additionalInfo: data.additionalInfo,
     }
 
-    //console.log(startTime.toISOString())
     console.log(bookingData)
     //await fnCreateBooking(bookingData)
 
@@ -83,26 +85,35 @@ export function BookingInput({ dateKey }: BookingInterface) {
     }
   }
 
-  return <form className="pt-10 max-w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-    <FieldGroup className="-space-y-4">
-      {/* Name field */}
-      <Field>
-        <FieldLabel htmlFor="attendee-name">
-          Full name <span className="text-destructive">*</span>
-        </FieldLabel>
-        <Input id="attendee-name"
-          {...register("name")} 
-          placeholder="Your name" 
-          required
-          disabled={isDisabled}
-          className="-mt-2"
-        />
-      </Field>
-      <div className="grid grid-cols-2 gap-2">
+  // handle form errors on submit
+  function onInvalid(errors: FieldErrors) {
+    console.error("Form error:", errors)
+  }
+
+  return <form className="pt-10 max-w-full space-y-4" onSubmit={handleSubmit(onSubmit, onInvalid)}>
+    <FieldGroup>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {/* Name field */}
+        <Field>
+          <FieldLabel htmlFor="attendee-name">
+            Full name <Asterisk className="text-destructive w-3 h-3 mb-2 -ml-1" />
+          </FieldLabel>
+          <Input id="attendee-name"
+            {...register("name")} 
+            placeholder="Your name" 
+            required
+            disabled={isDisabled}
+            className="-mt-2"
+          />
+          {errors.name && (
+            <FieldError className="text-xs -mt-2 text-destructive">{errors.name.message}</FieldError>
+          )}
+        </Field>
+
         {/* Email field */}
         <Field>
           <FieldLabel htmlFor="attendee-email">
-            Email <span className="text-destructive">*</span>
+            Email <Asterisk className="text-destructive w-3 h-3 mb-2 -ml-1" />
           </FieldLabel>
           <Input id="attendee-email"
             {...register("email")} 
@@ -112,68 +123,23 @@ export function BookingInput({ dateKey }: BookingInterface) {
             disabled={isDisabled}
             className="-mt-2"
           />
-        </Field>
-
-        {/* Phone number field */}
-        <Field>
-          <FieldLabel htmlFor="attendee-phone">
-            Phone <span className="text-destructive">*</span>
-          </FieldLabel>
-          <Input id="attendee-phone"
-            {...register("phone")} 
-            placeholder="Your phone number"
-            required
-            disabled={isDisabled}
-            className="-mt-2"
-          />
+          {errors.email && (
+            <FieldError className="text-xs -mt-2 text-destructive">{errors.email.message}</FieldError>
+          )}
         </Field>
       </div>
-
-      {/* Language picker field */}
-      <Field>
-        <FieldLabel htmlFor="select-language">Spoken language</FieldLabel>
-        <FieldDescription className="-mt-3 -mb-2">
-          For best results, select the language you speak.
-        </FieldDescription>
-        <Controller 
-          name="language" 
-          control={control}
-          render={( { field }) => (
-            <Select
-              disabled={isDisabled}
-              name={field.name}
-              value={field.value}
-              onValueChange={field.onChange}
-            >
-              <SelectTrigger
-                id="select-language"
-                className="min-w-[120px]"
-              >
-                <SelectValue placeholder="Select a language" />
-              </SelectTrigger>
-              <SelectContent position="item-aligned">
-                <SelectGroup>
-                  {spokenLanguages.map(locale => (
-                    // map locale to language label for selector
-                    <SelectItem key={locale.value} value={locale.value}>
-                      {locale.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          )}
-        />
-      </Field>
     </FieldGroup>
     <Field>
       <FieldLabel htmlFor="booking-info">Additional info</FieldLabel>
       <Textarea id="booking-info"
-        {...register("additionalInfo")} 
-        placeholder="What would you like to discuss?" 
+        {...register("additionalInfo")}
+        placeholder="What would you like to discuss? (500 characters or less)" 
         disabled={isDisabled}
         className="-mt-2 overflow-y-auto"
       />
+      {errors.additionalInfo && (
+        <FieldError className="text-xs -mt-2 text-destructive">{errors.additionalInfo.message}</FieldError>
+      )}
     </Field>
 
     {!isDisabled && <p>You have selected {dateKey} at {selectedTime}</p>}
@@ -197,8 +163,8 @@ export function BookingInput({ dateKey }: BookingInterface) {
           Cancel
         </Button>
       </div>
-      {errors && (
-        <p className="text-destructive text-sm mt-2">{errors.root?.message}</p>
+      {errors.root && (
+        <FieldError className="text-sm text-destructive">{errors.root?.message}</FieldError>
       )}
     </div>
   </form>

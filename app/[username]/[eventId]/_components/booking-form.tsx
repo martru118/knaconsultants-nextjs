@@ -1,12 +1,8 @@
 "use client"
 
-import { dayPickerSchema } from "@/lib/validators";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo } from "react";
 import { format } from "date-fns";
 import { fromZonedTime } from "date-fns-tz"
-import z from "zod";
 import { createBooking } from "@/actions/bookings";
 import useFetch from "@/hooks/use-fetch";
 import { useDayPicker } from "@/hooks/use-daypicker";
@@ -19,16 +15,8 @@ interface BookingFormProps {
 }
 
 function BookingForm({ availability }: BookingFormProps) {
-  const selectedDate = useDayPicker(state => state.selectedDate)
-  const selectedTime = useDayPicker(state => state.selectedTime)
-
-  const {
-    setValue,
-  } = useForm<z.infer<typeof dayPickerSchema>>({
-    resolver: zodResolver(dayPickerSchema),
-  });
-
   //initialize booking payload
+  const selectedDate = useDayPicker(state => state.selectedDate)
   const { data } = useFetch(createBooking)
 
   // fetch all available dates
@@ -42,18 +30,10 @@ function BookingForm({ availability }: BookingFormProps) {
     dateKey in availability? availability[dateKey] : [],
   [dateKey])
 
-  // manually validate selected date and time 
-  useEffect(() => {
-    if (selectedDate) setValue("date", dateKey)
-  }, [selectedDate, setValue])
-  useEffect(() => {
-    if (selectedTime) setValue("time", selectedTime)
-  }, [selectedTime, setValue])
-
   // success state
   if (data?.success) {
     return (
-      <div className="text-center">
+      <div className="text-center my-auto">
         <h2 className="text-2xl font-bold mb-4">✅ Booking successful!</h2>
         {data.booking && (
           <p>
