@@ -1,13 +1,13 @@
 "use client"
 
-import { useAuth, UserButton } from "@clerk/nextjs";
-import { LayoutDashboard } from "lucide-react";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { CircleUser, LayoutDashboard } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import { useEffect } from "react";
 import { syncUserChanges } from "@/actions/users";
 
 export default function UserMenu() {
-  const {isLoaded} = useAuth()
+  const {isLoaded, user} = useUser()
 
   // sync changes between Clerk and db
   useEffect(() => {
@@ -15,8 +15,11 @@ export default function UserMenu() {
   }, [isLoaded]);
 
   if (!isLoaded) {
+    // fixes Clerk button hydration bug
     return <Skeleton className="h-10 w-10 rounded-full" />
   } else {
+    // render Clerk button normally
+    const profile = user?.username
     return <UserButton appearance={{
       elements: {
         avatarBox: "w-10 h-10"
@@ -24,9 +27,14 @@ export default function UserMenu() {
     }}>
       <UserButton.MenuItems>
         <UserButton.Link 
-          label="My Dashboard" 
+          label="My dashboard" 
           labelIcon={<LayoutDashboard size={15} />}
           href="/dashboard" 
+        />
+        <UserButton.Link 
+          label="My profile"
+          labelIcon={<CircleUser size={15} />}
+          href={`/${profile}`}
         />
         <UserButton.Action label="manageAccount" />
       </UserButton.MenuItems>

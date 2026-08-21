@@ -13,11 +13,12 @@ import { nav } from "@/public/locales/en/common.json"
 import { useProfileStore } from "@/hooks/use-profile";
 import { emailAddress } from "@/constants/constants";
 import { useRouter } from "next/navigation";
+import { useShallow } from 'zustand/react/shallow'
 
 export function Navbar() {
   const [menuState, setMenuState] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const fetchProfile = useProfileStore(state => state.fetchProfile)
+  const fetchProfile = useProfileStore(useShallow(state => state.fetchProfile))
 
   // get username for action button
   useEffect(() => {
@@ -123,15 +124,15 @@ function ActionButton() {
 
   return <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
     <SignedOut>
+      {/*
       <SignInButton forceRedirectUrl="/dashboard">
         <Button variant="outline">Login</Button>
       </SignInButton>
-      {/*
+      */}
       <Button className="cursor-pointer" onClick={() => router.push(`/${userProfile}`)}>
         <Phone data-icon="inline-start" className="mr-1" />
         Book a call
       </Button>
-      */}
     </SignedOut>
     <SignedIn>
       <div className="flex flex-row space-x-2 justify-between">

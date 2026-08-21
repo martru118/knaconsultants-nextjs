@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,10 +14,12 @@ import { cachedLatestMeetings } from "@/actions/meetings";
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import { User } from "@clerk/nextjs/server";
-import Link from "next/link";
-import { AlertTriangleIcon, ExternalLink } from "lucide-react";
+import { AlertTriangleIcon } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription, AlertAction } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
+import { domain } from "@/constants/constants";
+import { useProfileStore } from "@/hooks/use-profile";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 
 interface LatestUpdatesProps {
   user: User
@@ -90,6 +91,9 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
 }
 
 function UniqueLinkCard({response, user}: UniqueLinkProps) {
+  const isUpdated = useProfileStore(state => state.isUpdated)
+  const setIsUpdated = useProfileStore(state => state.setIsUpdated)
+
   const {
     register,
     handleSubmit,
@@ -114,66 +118,58 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
     await fnUpdateUsername({ username: data.username });
 
     // handle success state
-    if (!loading && !e) window.alert("Username updated successfully")
+    if (!loading && !e) setIsUpdated(true)
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Your unique link</CardTitle>
-        <p className="text-sm font-light">Last updated: {user?.updatedAt.toLocaleString()}</p>
+        <p className="text-sm font-light">
+          Last updated: {(isUpdated && !e)? "Just now" : user?.updatedAt.toLocaleString()}
+        </p>
       </CardHeader>
 
       <CardContent>
         <form id="username-form" onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span>localhost:3000/</span>
-              <Input {...register("username")} placeholder="username" />
+          <Field>
+            <div className="flex flex-col md:flex-row gap-1">
+              <FieldLabel>{domain}/</FieldLabel>
+              <InputGroup>
+                <InputGroupInput {...register("username")} placeholder="username" />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton 
+                    variant="secondary" 
+                    type="submit" 
+                    disabled={loading}
+                  >
+                    {loading? <Spinner data-icon="inline-start" /> : null}
+                    Update
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
             </div>
             {
               // error for form input
-              errors.username && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.username.message}
-                </p>
-              )
+              errors.username && <FieldError className="text-destructive text-sm -mt-2">
+                {errors.username.message}
+              </FieldError>
             }
             {
               // api error
-              e && (
-                <p className="text-destructive text-sm mt-1">
-                  {e.message}
-                </p>
-              )
+              e && <FieldError className="text-destructive text-sm -mt-2">
+                {e.message}
+              </FieldError>
             }
-          </div>
+          </Field>
         </form>
       </CardContent>
-      <CardFooter className="flex gap-2">
-        <Button type="submit" disabled={loading} form="username-form">
-          {loading? <Spinner data-icon="inline-start" /> : null}
-          Update username
-        </Button>
-
-        <Link 
-          href={`${window.location.origin}/${user?.username}`} 
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button type="button" variant="outline" disabled={loading}>
-            <ExternalLink className="mr-2 h-4 w-4" />
-            View profile
-          </Button>
-        </Link>
-      </CardFooter>
     </Card>
   )
 }
 
 function OnboardingAlert() {
   const { openUserProfile } = useClerk()
-  const router = useRouter()
   
   // show when user is missing Google Account
   return (
@@ -185,14 +181,6 @@ function OnboardingAlert() {
       </AlertDescription>
 
       <AlertAction>
-        <Button
-          onClick={() => router.refresh()}
-          className="mr-1"
-          size="xs" 
-          variant="outline"
-        >
-          Dismiss
-        </Button>
         <Button 
           onClick={() => openUserProfile() }
           className="bg-amber-900 hover:bg-amber-700" 
