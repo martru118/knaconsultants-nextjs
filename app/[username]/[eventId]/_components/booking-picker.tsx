@@ -7,6 +7,7 @@ import { addDays } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { booking } from "@/public/locales/en/common.json"
+import { useShallow } from "zustand/react/shallow";
 
 const today = new Date()
 
@@ -18,8 +19,8 @@ interface DayPickerProps {
 export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
   const selectedDate = useDayPicker(state => state.selectedDate)
   const selectedTime = useDayPicker(state => state.selectedTime)
-  const setDate = useDayPicker(state => state.setDate)
-  const setTime = useDayPicker(state => state.setTime)
+  const setDate = useDayPicker(useShallow(state => state.setDate))
+  const setTime = useDayPicker(useShallow(state => state.setTime))
 
   return <div className="md:h-90 flex flex-col md:flex-row gap-5">
     <div className="max-w-full">

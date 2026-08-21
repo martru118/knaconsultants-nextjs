@@ -1,20 +1,21 @@
 {
-  "title": "K & A Consulting Ltd.",
-  "metadata": "Consulting for every step of your business",
-  "nav": [
-    {
-      "title": "Our Services",
-      "href": "#services"
-    },
-    {
-      "title": "About Us",
-      "href": "#about"
-    },
-    {
-      "title": "Contact",
-      "href": "#contact"
-    }
-  ],
+  "header": {
+    "action": "Book a call",
+    "nav": [
+      {
+        "title": "Our Services",
+        "href": "/#services"
+      },
+      {
+        "title": "About Us",
+        "href": "/#about"
+      },
+      {
+        "title": "Contact",
+        "href": "/#contact"
+      }
+    ]
+  },
   "hero": {
     "heading": "Turn your business ideas into reality",
     "subheading": "We do consulting for every step of your business.",
@@ -68,13 +69,15 @@
   "profile": {
     "heading": "Welcome to my scheduling page! Please select an event to book a call with me.",
     "empty": "No public events available.",
-    "nav": "Return to home"
+    "nav": "Home"
   },
   "booking": {
     "heading": "Available time slots",
     "empty": "No time slots available.",
     "nav": "Return to events page",
     "action": "Schedule event",
+    "secondary": "Cancel",
+    "loading": "Loading booking info...",
     "fields": [
       {
         "title": "Full name",
@@ -86,9 +89,13 @@
       },
       {
         "title": "Additional info",
-        "hint": "What would you like to discuss?"
+        "hint": "What would you like to discuss? (500 characters or less)"
       }
-    ]
+    ],
+    "success": {
+      "title": "✅ Booking successful!",
+      "message": "Make sure to accept your invite, it will be emailed to you shortly."
+    }
   },
   "footer": {
     "heading": "K & A Consulting Ltd, All rights reserved",

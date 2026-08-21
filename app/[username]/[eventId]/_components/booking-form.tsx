@@ -9,6 +9,7 @@ import { useDayPicker } from "@/hooks/use-daypicker";
 import { dateFormat, tzString } from "@/constants/constants";
 import { BookingDayPicker } from "./booking-picker";
 import { BookingInput } from "./booking-input";
+import { booking } from "@/public/locales/en/common.json"
 
 interface BookingFormProps {
   availability: Record<string, string[]>
@@ -37,6 +38,7 @@ function BookingForm({ availability }: BookingFormProps) {
         <h2 className="text-2xl font-bold mb-4">✅ Booking successful!</h2>
         {data.booking && (
           <p>
+            {booking.success.message}<br/>
             Join the meeting:{" "}
             <a
               href={data.booking}

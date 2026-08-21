@@ -15,6 +15,7 @@ import { Asterisk, CalendarDays } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
+import { booking } from "@/public/locales/en/common.json"
 
 interface BookingInterface {
   dateKey: string,  // selected date as booking key
@@ -96,11 +97,11 @@ export function BookingInput({ dateKey }: BookingInterface) {
         {/* Name field */}
         <Field>
           <FieldLabel htmlFor="attendee-name">
-            Full name <Asterisk className="text-destructive w-3 h-3 mb-2 -ml-1" />
+            {booking.fields.at(0)?.title} <Asterisk className="text-destructive w-3 h-3 mb-2 -ml-1" />
           </FieldLabel>
           <Input id="attendee-name"
             {...register("name")} 
-            placeholder="Your name" 
+            placeholder={booking.fields.at(0)?.hint}
             required
             disabled={isDisabled}
             className="-mt-2"
@@ -113,12 +114,12 @@ export function BookingInput({ dateKey }: BookingInterface) {
         {/* Email field */}
         <Field>
           <FieldLabel htmlFor="attendee-email">
-            Email <Asterisk className="text-destructive w-3 h-3 mb-2 -ml-1" />
+          {booking.fields.at(1)?.title} <Asterisk className="text-destructive w-3 h-3 mb-2 -ml-1" />
           </FieldLabel>
           <Input id="attendee-email"
             {...register("email")} 
             type="email" 
-            placeholder="Your email"
+            placeholder={booking.fields.at(1)?.hint}
             required
             disabled={isDisabled}
             className="-mt-2"
@@ -130,10 +131,10 @@ export function BookingInput({ dateKey }: BookingInterface) {
       </div>
     </FieldGroup>
     <Field>
-      <FieldLabel htmlFor="booking-info">Additional info</FieldLabel>
+      <FieldLabel htmlFor="booking-info">{booking.fields.at(2)?.title}</FieldLabel>
       <Textarea id="booking-info"
         {...register("additionalInfo")}
-        placeholder="What would you like to discuss? (500 characters or less)" 
+        placeholder={booking.fields.at(2)?.hint}
         disabled={isDisabled}
         className="-mt-2 overflow-y-auto"
       />
@@ -151,7 +152,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
           className="w-full"
         >
           {loading? <Spinner data-icon="inline-start" /> : <CalendarDays data-icon="inline-start" />}
-          Schedule event
+          {booking.action}
         </Button>
         <Button 
           type="button"
@@ -160,7 +161,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
           className="w-full"
           onClick={() => router.push(`/${username}`)}
         >
-          Cancel
+          {booking.secondary}
         </Button>
       </div>
       {errors.root && (

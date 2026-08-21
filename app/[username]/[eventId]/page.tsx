@@ -8,6 +8,7 @@ import { cachedEventAvailability } from "@/actions/availability";
 import { BeatLoader } from "react-spinners";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/Footer";
+import { booking } from "@/public/locales/en/common.json"
 
 interface PageProps {
   params: Promise<{username: string, eventId: string}>
@@ -68,7 +69,7 @@ function EventDetailsLoader() {
     <div className="flex flex-col gap-2 mt-4">
       <Skeleton className="h-4 w-2/3" />
       <Skeleton className="h-4 w-2/3" />
-      <Skeleton className="aspect-video w-full" />
+      <Skeleton className="aspect-video" />
     </div>
   </div>
 }
@@ -76,7 +77,7 @@ function EventDetailsLoader() {
 function BookingLoader() {
   return <div className="flex flex-col w-full m-auto gap-2 items-center">
     <BeatLoader size={20} />
-    <p>Loading booking info...</p>
+    <p>{booking.loading}</p>
   </div>
 }
 

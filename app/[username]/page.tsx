@@ -12,8 +12,6 @@ import { notFound } from "next/navigation";
 import { profile } from "@/public/locales/en/common.json";
 import { Logo } from "@/components/logo";
 import { Footer } from "@/components/Footer";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Suspense } from "react";
 
 interface PageProps {
   params: Promise<{username: string}>
@@ -50,7 +48,7 @@ async function UserPage({params}: PageProps) {
         }}
       />
       <main className="relative min-h-screen overflow-hidden px-4 py-4">
-        <div className="mx-auto pb-8 px-4 flex justify-between items-center">
+        <div className="mx-auto pb-8 md:px-4 flex justify-between items-center">
           <Button asChild variant="ghost">
             <Link href="/">
               <Home data-icon="inline-start" />{" "}
@@ -69,60 +67,39 @@ async function UserPage({params}: PageProps) {
           </div>
         </div>
 
-        <Suspense fallback={<LoadingSkeleton />}>
-          <div className="flex flex-col items-center mb-8">
-            <Avatar className="w-24 h-24 mb-4">
-              <AvatarImage className="rounded-full" src={user.imageUrl!} alt={user.name!} />
-              <AvatarFallback className="inline-flex items-center justify-center w-24 h-24 text-7xl text-white font-bold bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
-                <User className="w-16 h-16" />
-              </AvatarFallback>
-            </Avatar>
-            <h1 className="text-3xl font-bold mb-2">{user.name}</h1>
-            <p className="text-gray-600 text-center">
-              {profile.heading}
-            </p>
-          </div>
+        <div className="flex flex-col items-center mb-8">
+          <Avatar className="w-24 h-24 mb-4">
+            <AvatarImage className="rounded-full" src={user.imageUrl!} alt={user.name!} />
+            <AvatarFallback className="inline-flex items-center justify-center w-24 h-24 text-7xl text-white font-bold bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
+              <User className="w-16 h-16" />
+            </AvatarFallback>
+          </Avatar>
+          <h1 className="text-3xl font-bold mb-2">{user.name}</h1>
+          <p className="text-gray-600 text-center">
+            {profile.heading}
+          </p>
+        </div>
 
-          {user.events.length === 0? (
-            <p className="text-gray-600 text-center">{profile.empty}</p>
-          ) : (
-            <div className="container mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {user.events.map((event) => {
-                return <Link key={`${event.id}`} href={`/${username}/${event.id}`}>
-                  <EventCard 
-                    key={event.id}
-                    event={event as any}
-                    user={username}
-                    isPublic
-                  />
-                </Link>
-              })}
-            </div>
-          )}
-        </Suspense>
+        {user.events.length === 0? (
+          <p className="text-gray-600 text-center">{profile.empty}</p>
+        ) : (
+          <div className="container mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {user.events.map((event) => {
+              return <Link key={`${event.id}`} href={`/${username}/${event.id}`}>
+                <EventCard 
+                  key={event.id}
+                  event={event as any}
+                  user={username}
+                  isPublic
+                />
+              </Link>
+            })}
+          </div>
+        )}
       </main>
       <Footer />
     </>
   );
-}
-
-function LoadingSkeleton() {
-  return (
-    <div>
-      <div className="flex flex-col items-center mb-8">
-        <Avatar className="inline-flex items-center justify-center w-24 h-24 text-7xl text-white font-bold bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
-          <User className="w-16 h-16" />
-        </Avatar>
-        <Skeleton className="h-8 w-1/4 mb-4 mt-4" />
-        <Skeleton className="h-4 w-1/2" />
-      </div>
-      <div className="container mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Skeleton className="aspect-video w-full" />
-        <Skeleton className="aspect-video w-full" />
-        <Skeleton className="aspect-video w-full" />
-      </div>
-    </div>
-  )
 }
 
 export default UserPage

@@ -9,11 +9,11 @@ import { cn } from "@/lib/utils";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import CreateEventButton from "@/components/events/CreateEventButton";
 import UserMenu from "./UserMenu";
-import { nav } from "@/public/locales/en/common.json"
+import { header } from "@/public/locales/en/common.json"
 import { useProfileStore } from "@/hooks/use-profile";
 import { emailAddress } from "@/constants/constants";
 import { useRouter } from "next/navigation";
-import { useShallow } from 'zustand/react/shallow'
+import { useShallow } from "zustand/react/shallow";
 
 export function Navbar() {
   const [menuState, setMenuState] = useState(false);
@@ -74,7 +74,7 @@ export function Navbar() {
               {/* Desktop navbar */}
               <div className="m-auto hidden size-fit lg:block">
                 <ul className="flex gap-1">
-                  {nav.map((item, index) => (
+                  {header.nav.map((item, index) => (
                     <li key={index}>
                       <Button
                         asChild
@@ -95,7 +95,7 @@ export function Navbar() {
             <div className="bg-background in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
               <div className="lg:hidden">
                 <ul className="space-y-6 text-base">
-                  {nav.map((item, index) => (
+                  {header.nav.map((item, index) => (
                     <li key={index}>
                       <Link
                         href={item.href}
@@ -131,7 +131,7 @@ function ActionButton() {
       */}
       <Button className="cursor-pointer" onClick={() => router.push(`/${userProfile}`)}>
         <Phone data-icon="inline-start" className="mr-1" />
-        Book a call
+        {header.action}
       </Button>
     </SignedOut>
     <SignedIn>
