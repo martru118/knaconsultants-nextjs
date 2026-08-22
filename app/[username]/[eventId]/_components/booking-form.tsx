@@ -3,8 +3,6 @@
 import { useMemo } from "react";
 import { format } from "date-fns";
 import { fromZonedTime } from "date-fns-tz"
-import { createBooking } from "@/actions/bookings";
-import useFetch from "@/hooks/use-fetch";
 import { useDayPicker } from "@/hooks/use-daypicker";
 import { dateFormat, tzString } from "@/constants/constants";
 import { BookingDayPicker } from "./booking-picker";
@@ -18,7 +16,8 @@ interface BookingFormProps {
 function BookingForm({ availability }: BookingFormProps) {
   //initialize booking payload
   const selectedDate = useDayPicker(state => state.selectedDate)
-  const { data } = useFetch(createBooking)
+  const response = useDayPicker(state => state.response)
+  const bookingData = useDayPicker(state => state.booking)
 
   // fetch all available dates
   const dateKey = format(selectedDate, dateFormat)
@@ -32,21 +31,21 @@ function BookingForm({ availability }: BookingFormProps) {
   [dateKey])
 
   // success state
-  if (data?.success) {
+  if (response) {
     return (
       <div className="text-center my-auto">
         <h2 className="text-2xl font-bold mb-4">✅ Booking successful!</h2>
-        {data.booking && (
+        {bookingData && (
           <p>
             {booking.success.message}<br/>
             Join the meeting:{" "}
             <a
-              href={data.booking}
+              href={bookingData}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 hover:underline"
             >
-              {data.booking}
+              {bookingData}
             </a>
           </p>
         )}

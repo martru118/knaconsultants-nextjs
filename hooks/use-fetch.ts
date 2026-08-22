@@ -7,7 +7,7 @@ export default function useFetch<TData, TArgs extends any[]>(
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fn = async (...args: TArgs): Promise<void> => {
+  const fn = async (...args: TArgs): Promise<TData | undefined> => {
     setLoading(true);
     setError(null);
 
@@ -15,7 +15,7 @@ export default function useFetch<TData, TArgs extends any[]>(
       // fetch api response
       const response = await callback(...args);
       setData(response);
-      setError(null);
+      return response
     } catch (err) {
       // catch errors
       setError(err as Error);

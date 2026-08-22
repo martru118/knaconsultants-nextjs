@@ -10,12 +10,10 @@ interface MeetingProps {
 }
 
 export default function MeetingsList({meetings, filter}: MeetingProps) {
-  if (meetings.length === 0) {
-    return <p>No {filter} meetings found.</p>
-  }
+  if (meetings.length === 0) return <p>No {filter} meetings found.</p>
   
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2">
       {meetings.map((meeting) => (
         <Card key={meeting.id} className="flex flex-col justify-between">
           <CardHeader>
@@ -25,7 +23,7 @@ export default function MeetingsList({meetings, filter}: MeetingProps) {
               &quot;{meeting.additionalInfo}&quot;
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             <div className="flex items-center mb-2">
               <Calendar className="mr-2 h-4 w-4" />
               <span>{format(new Date(meeting.startTime), "MMMM d, yyyy")}</span>

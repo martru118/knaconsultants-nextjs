@@ -16,6 +16,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 import { booking } from "@/public/locales/en/common.json"
+import { useShallow } from "zustand/react/shallow";
 
 interface BookingInterface {
   dateKey: string,  // selected date as booking key
@@ -24,6 +25,7 @@ interface BookingInterface {
 export function BookingInput({ dateKey }: BookingInterface) {
   const selectedTime = useDayPicker(state => state.selectedTime)
   const duration = useDayPicker(state => state.duration)
+  const setBooking = useDayPicker(useShallow(state => state.setBooking))
 
   // handle form cancellation
   const {username, eventId} = useParams()
@@ -33,6 +35,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
   const {
     loading, 
     error: e,
+    fn: fnCreateBooking
   } = useFetch(createBooking)
   const isDisabled = !selectedTime || loading
 
@@ -67,7 +70,7 @@ export function BookingInput({ dateKey }: BookingInterface) {
 
     // prepare booking data object
     const bookingData = {
-      eventId: eventId,
+      eventId: eventId!.toString(),
       name: data.name,
       email: data.email,
       startTime,
@@ -76,14 +79,13 @@ export function BookingInput({ dateKey }: BookingInterface) {
     }
 
     console.log(bookingData)
-    //await fnCreateBooking(bookingData)
+    const response = await fnCreateBooking(bookingData)
 
     // handle error state
-    if (e) {
-      setError("root", {
-        message: e.message
-      })
-    }
+    if (e) setError("root", { message: e.message })
+
+    // handle success state
+    if (response) setBooking(response)
   }
 
   // handle form errors on submit
