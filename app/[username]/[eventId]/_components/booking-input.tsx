@@ -78,7 +78,6 @@ export function BookingInput({ dateKey }: BookingInterface) {
       additionalInfo: data.additionalInfo,
     }
 
-    console.log(bookingData)
     const response = await fnCreateBooking(bookingData)
 
     // handle error state

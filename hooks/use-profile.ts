@@ -12,7 +12,7 @@ export const useProfileStore = create<ProfileState>(set => ({
   profile: null,
   isUpdated: false,
   fetchProfile: async(email) => {
-    // fetch username from database
+    // fetch username from Clerk
     const username = await cachedUserProfile(email)
     set({ profile: username })
   },

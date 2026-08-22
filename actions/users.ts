@@ -69,14 +69,9 @@ export const cachedUserEvents = cache(getUserEvents)
 
 async function getProfileUsername(email: string) {
   // fetch username by email
-  const user = await db.user.findFirst({
-    where: { email },
-    select: {
-      username: true,
-    }
-  })
-
-  return user?.username ?? null
+  const userList = (await clerkClient()).users.getUserList({emailAddress: [email]})
+  const singleUser = (await userList).data.at(0)
+  return singleUser?.username ?? null
 }
 
 export const cachedUserProfile = cache(getProfileUsername)
