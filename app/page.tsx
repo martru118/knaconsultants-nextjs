@@ -1,9 +1,9 @@
 /*  Components list
-  Hero section https://tailwindflex.com/@ariaw/hero-with-background-image
+  Hero section https://tailark.com/blocks/mist/hero-section
   Hero button https://magicui.design/docs/components/rainbow-button
-  Our services cards https://kokonutui.com/docs/cards/card
-  Our services section https://ui.tripled.work/components/our-services-section
-  Testimonials https://tailark.com/dusk/testimonials
+  Our Services section https://ui.tripled.work/components/services-grid-block
+  About Us section https://prebuiltui.com/components/about
+  Dashboard layout https://efferd.com/blocks/app-shell
 */
 
 import { Navbar } from "@/components/Navbar";

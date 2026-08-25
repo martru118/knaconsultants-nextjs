@@ -108,6 +108,5 @@ export const deleteEvent = createSafeAction(
     
     // deleted successfully
     revalidatePath("/events")
-    revalidatePath("/[username]", "page")
   }
 )

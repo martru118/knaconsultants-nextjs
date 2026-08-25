@@ -65,7 +65,7 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
           <div className="space-y-6 font-light">
             <div>
               {upcomingMeetings && upcomingMeetings?.length > 0 ? (
-                <ul className="list-disc">
+                <ul className="list-disc ml-4">
                   {upcomingMeetings?.map((meeting) => (
                     <li key={meeting.id}>
                       {meeting.event.title} on{" "}
@@ -115,10 +115,13 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
   }, [response]);
 
   async function onSubmitForm(data: z.infer<typeof usernameSchema>) {
-    await fnUpdateUsername({ username: data.username });
+    const response = await fnUpdateUsername({ username: data.username });
 
     // handle success state
-    if (!loading && !e) setIsUpdated(true)
+    if (response) {
+      setIsUpdated(true)
+      window.alert("Username changed successfully")
+    }
   }
 
   return (
@@ -126,7 +129,7 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
       <CardHeader>
         <CardTitle>Your unique link</CardTitle>
         <p className="text-sm font-light">
-          Last updated: {(isUpdated && !e)? "Just now" : user?.updatedAt.toLocaleString()}
+          Last updated: {isUpdated? "Just now" : user?.updatedAt.toLocaleString()}
         </p>
       </CardHeader>
 

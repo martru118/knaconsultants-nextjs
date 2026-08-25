@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import { Controller, Form, useForm } from "react-hook-form";
+import { Controller, Form, useForm, useWatch } from "react-hook-form";
 import { DAYS_OF_WEEK_IN_ORDER, defaultAvailability } from "@/constants/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { availabilitySchema } from "@/lib/validators";
@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
 import { updateAvailability } from "@/actions/availability";
 import z from "zod";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import { SaveIcon } from "lucide-react";
 
 interface FormProps {
   initialData: Partial<typeof defaultAvailability>
@@ -38,11 +39,12 @@ function AvailabilityForm({ initialData }: FormProps) {
   } = useFetch(updateAvailability)
 
   async function onSubmit(data: z.infer<typeof availabilitySchema>) {
-    await fnUpdateAvailability(data)
+    const response = await fnUpdateAvailability(data)
+    if (response) window.alert("Availability changed successfully")
   }
 
   function renderDayInput(day: typeof availabilitySchema) {
-    const isAvailable = watch(`${day}.isAvailable`)
+    const isAvailable = useWatch({name: `${day}.isAvailable`, control})
 
     return (
       <div key={day} className="flex items-center space-x-2 mb-4">
@@ -91,9 +93,9 @@ function AvailabilityForm({ initialData }: FormProps) {
             </FieldGroup>
 
             {errors[day]?.endTime && (
-              <span className="text-destructive text-sm ml-2">
+              <FieldError className="text-destructive text-sm ml-2">
                 {errors[day].endTime.message}
-              </span>
+              </FieldError>
             )}
           </div>
         )}
@@ -105,28 +107,27 @@ function AvailabilityForm({ initialData }: FormProps) {
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       {DAYS_OF_WEEK_IN_ORDER.map(renderDayInput)}
       
-      <div className="flex items-center space-x-4 mt-5">
-        <span className="w-48">Minimum gap before bookings (mins.):</span>
-        <Input
+      <Field className="flex flex-row items-center mt-5 w-full lg:w-1/2">
+        <FieldLabel htmlFor="timegap-input">Minimum gap before bookings (mins)</FieldLabel>
+        <Input id="timegap-input"
           type="number"
           {...register("timeGap", {
             valueAsNumber: true,
           })}
-          className="w-32 bg-white"
+          className="bg-primary-foreground"
         />
-
-        {errors.timeGap && (
-          // error handling for time gap input
-          <p className="text-destructive text-sm">{errors.timeGap.message}</p>
-        )}
-      </div>
+      </Field>
+      {errors.timeGap && (
+        // error handling for time gap input
+        <FieldError className="text-destructive text-sm -mt-5">{errors.timeGap.message}</FieldError>
+      )}
 
       <div className="flex flex-row items-center space-x-4">
         <Button type="submit" disabled={loading}>
-          {loading? <Spinner data-icon="inline-start" /> : null}
-          Update schedule
+          {loading? <Spinner data-icon="inline-start" /> : <SaveIcon data-icon="inline-start" />}
+          Save schedule
         </Button>
-        {e && <p className="text-destructive text-sm">{e.message}</p>}
+        {e && <FieldError className="text-destructive text-sm">{e.message}</FieldError>}
       </div>
     </form>
   );

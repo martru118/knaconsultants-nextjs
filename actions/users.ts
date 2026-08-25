@@ -32,6 +32,7 @@ export async function updateUsername(user: z.infer<typeof usernameSchema>) {
 
   //update username in Clerk
   (await clerkClient()).users.updateUser(userId, user);
+  return true
 }
 
 async function getUserEvents(username: string) {

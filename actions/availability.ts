@@ -116,6 +116,8 @@ export const updateAvailability = createSafeAction(
         },
       });
     }
+
+    return true
   }
 )
 

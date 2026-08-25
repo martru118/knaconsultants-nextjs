@@ -24,7 +24,7 @@ export function HeroSection() {
 
               <div className="flex items-center justify-center gap-3">
                 <RainbowButton asChild size="lg">
-                  <Link href={`/${userProfile}`}>
+                  <Link href={`/${userProfile}`} prefetch={false}>
                     <span className="text-nowrap">{hero.cta}</span>
                     <ChevronRight className="ml-1" />
                   </Link>
@@ -38,6 +38,8 @@ export function HeroSection() {
                 <div className="bg-background rounded-(--radius) relative mx-auto overflow-hidden border border-transparent shadow-lg shadow-black/10 ring-1 ring-black/10">
                   <img
                     className="size-full -scale-x-100 object-cover bg-black"
+                    loading="lazy"
+                    alt="Hero image"
                     src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   />
                 </div>
