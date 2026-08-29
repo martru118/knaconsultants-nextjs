@@ -11,7 +11,7 @@ export default function CreateEventButton() {
   return (
     <Button 
       onClick={openDrawer}
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 w-full"
     >
       <PenBox size={18} />
       Create Event

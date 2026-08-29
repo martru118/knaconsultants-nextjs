@@ -20,10 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={font.className}>
         <ClerkProvider>
-          <main className="min-h-screen">
-            {children}
-          </main>
-
+          {children}
           <CreateEventDrawer />
         </ClerkProvider>
       </body>

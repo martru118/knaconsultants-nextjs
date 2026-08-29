@@ -62,7 +62,7 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
       </CardHeader>
       <CardContent>
         {!loading ? (
-          <div className="space-y-6 font-light">
+          <div className="font-light">
             <div>
               {upcomingMeetings && upcomingMeetings?.length > 0 ? (
                 <ul className="list-disc ml-4">
