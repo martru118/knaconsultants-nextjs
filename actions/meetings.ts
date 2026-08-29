@@ -26,7 +26,7 @@ export type UserMeetings = Prisma.BookingGetPayload<{
   },
 }>
 
-export async function getUserMeetings(filter: string) {
+export async function getUserMeetings() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -37,7 +37,9 @@ export async function getUserMeetings(filter: string) {
   const meetings = await db.booking.findMany({
     where: {
       userId: user.id,
-      startTime: filter === "upcoming" ? { gte: now } : { lt: now },
+      startTime: { 
+        gte: now 
+      },
     },
     include: {
       event: {
@@ -52,8 +54,9 @@ export async function getUserMeetings(filter: string) {
       },
     },
     orderBy: {
-      startTime: filter === "upcoming"? "asc" : "desc"
-    }
+      startTime: "asc"
+    },
+    take: 10
   });
 
   return meetings

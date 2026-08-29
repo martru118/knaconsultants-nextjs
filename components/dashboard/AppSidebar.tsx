@@ -18,19 +18,19 @@ export const navData: NavItem[] = [
 export function AppSidebar() {
   return (
     <Sidebar className="px-0 h-full [&_[data-slot=sidebar-inner]]:h-full">
-      <div className="flex flex-col gap-6">
-        {/* ---------------- Header ---------------- */}
-        <SidebarHeader className="px-4">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <a href="/" className="w-full h-full">
-                <Logo />
-              </a>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
+      {/* ---------------- Header ---------------- */}
+      <SidebarHeader className="py-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <a href="/" className="w-full h-full">
+              <Logo uniColor />
+            </a>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-        {/* ---------------- Content ---------------- */}
+      {/* ---------------- Content ---------------- */}
+      <div className="flex flex-col gap-6">
         <SidebarContent className="overflow-hidden">
 					<SidebarGroup>
 						<SidebarMenuItem>

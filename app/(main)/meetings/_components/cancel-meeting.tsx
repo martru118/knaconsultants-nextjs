@@ -9,7 +9,7 @@ interface CancelMeetingProps {
 }
 
 export default function CancelMeetingButton({meetingId}: CancelMeetingProps) {
-  const { loading, error, fn: fnCancelMeeting } = useFetch(cancelMeeting)
+  const { loading, fn: fnCancelMeeting } = useFetch(cancelMeeting)
 
   async function handleCancel() {
     if (window.confirm("Are you sure you want to cancel this meeting?")) {

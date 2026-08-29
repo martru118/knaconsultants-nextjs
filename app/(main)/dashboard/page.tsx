@@ -20,6 +20,7 @@ import { domain } from "@/constants/constants";
 import { useProfileStore } from "@/hooks/use-profile";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import { AppLoader } from "@/components/dashboard/AppLoader";
 
 interface LatestUpdatesProps {
   user: User
@@ -34,13 +35,18 @@ function Dashboard() {
   const { isLoaded, user } = useUser();
   const providers = user?.externalAccounts.map(account => account.provider)
 
-  return (
-    <div className="space-y-5">
-      {!providers?.includes("google") && <OnboardingAlert />}
-      <LatestMeetingsCard user={user as any} />
-      <UniqueLinkCard response={isLoaded} user={user as any} />
-    </div>
-  );
+  if (isLoaded) {
+    return (
+      <div className="space-y-5">
+        {!providers?.includes("google") && <OnboardingAlert />}
+        <LatestMeetingsCard user={user as any} />
+        <UniqueLinkCard response={isLoaded} user={user as any} />
+      </div>
+    );
+  } else {
+    // display loading state
+    return <AppLoader />
+  }
 }
 
 function LatestMeetingsCard({user}: LatestUpdatesProps) {

@@ -22,7 +22,7 @@ function AppLayout({ children }: LayoutProps) {
         <AppSidebar />
         {/* ---------------- Main ---------------- */}
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b px-4">
+          <header className="sticky top-0 z-50 bg-primary-foreground md:border-x flex h-14 items-center justify-between border-b px-4">
             <SidebarTrigger className="cursor-pointer"/>
             <span>{title}</span>
             <UserMenu />

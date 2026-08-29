@@ -1,10 +1,11 @@
 import { cachedDashboardEvents } from "@/actions/events";
+import { AppLoader } from "@/components/dashboard/AppLoader";
 import EventCard from "@/components/events/EventCard";
 import { Suspense } from "react";
 
 function EventsDashboard() {
   return (
-    <Suspense fallback={<div>Loading events...</div>}>
+    <Suspense fallback={<AppLoader />}>
       <EventsPage />
     </Suspense>
   );
