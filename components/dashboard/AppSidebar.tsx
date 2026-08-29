@@ -34,7 +34,7 @@ export function AppSidebar() {
         <SidebarContent className="overflow-hidden">
 					<SidebarGroup>
 						<SidebarMenuItem>
-							<CreateEventButton />
+							<CreateEventButton isSidebar />
 						</SidebarMenuItem>
 					</SidebarGroup>
 					<div className="px-4">

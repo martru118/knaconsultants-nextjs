@@ -14,7 +14,7 @@ export const usernameSchema = z.object({
 
 // event form schema
 export const eventSchema = z.object({
-  id: z.uuid(),
+  id: z.string(),
   title: z
     .string()
     .min(1, "Title is required")
@@ -26,6 +26,8 @@ export const eventSchema = z.object({
   duration: z.number().int().positive("Duration must be a positive number"),
   isPrivate: z.boolean(),
 });
+
+export type EventSchemaType = z.infer<typeof eventSchema>
 
 // availability schemas
 export const daySchema = z.object({

@@ -1,14 +1,13 @@
 "use client"
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { eventSchema } from "@/lib/validators";
+import { eventSchema, EventSchemaType } from "@/lib/validators";
 import { createEvent, updateEvent } from "@/actions/events";
 import useFetch from "@/hooks/use-fetch";
-import z from "zod";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Switch } from "../ui/switch";
 import { Spinner } from "../ui/spinner";
@@ -32,7 +31,7 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
     setValue,
     setError,
     formState: { errors },
-  } = useForm<z.infer<typeof eventSchema>>({
+  } = useForm<EventSchemaType>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       id: initialData?.id || "",
@@ -50,24 +49,23 @@ function EventForm ({ onSubmitForm, initialData }: FormProps) {
   } = initialData?.id.length ? useFetch(updateEvent) : useFetch(createEvent)
 
   // handle submit state
-  async function onSubmit(data: z.infer<typeof eventSchema>) {
-    await fn(data);
+  async function onSubmit(data: EventSchemaType) {
+    const response = await fn(data);
 
-    // handle error state
-    if (e) {
-      setError("root", {
-        message: e.message,
-      })
-    }
-
-    // handle success state
-    if (!loading && !e) onSubmitForm()
+    // handle error and success states
+    if (e) setError("root", { message: e.message })
+    if (response) onSubmitForm()
   };
+
+  // handle form errors on submit
+  function onInvalid(errors: FieldErrors) {
+    console.error("Form error:", errors)
+  }
 
   return (
     <form
       className="px-6 flex flex-col gap-4"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, onInvalid)}
     >
       <FieldGroup>
         <div className="grid grid-cols-2 gap-2">

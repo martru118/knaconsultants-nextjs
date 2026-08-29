@@ -26,7 +26,7 @@ function EventCard({event, user, isPublic=false}: CardProps) {
       >
         <Card className="flex flex-col h-full justify-between cursor-pointer">
           <CardHeader>
-            <CardTitle className="text-xl line-clamp-3">{event.title}</CardTitle>
+            <CardTitle className="text-xl line-clamp-2">{event.title}</CardTitle>
             <CardDescription className="flex justify-between">
               <span>
                 {event.duration} mins
@@ -53,7 +53,7 @@ function EventCard({event, user, isPublic=false}: CardProps) {
     return (
       <Card className="flex flex-col h-full justify-between">
         <CardHeader>
-          <CardTitle className="text-2xl line-clamp-3">{event.title}</CardTitle>
+          <CardTitle className="text-2xl line-clamp-2">{event.title}</CardTitle>
           <CardDescription className="flex justify-between">
             <span>
               {event.duration} mins | {event.isPrivate ? "Private" : "Public"}

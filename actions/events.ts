@@ -37,6 +37,7 @@ export const createEvent = createSafeAction(
     // created successfully
     revalidatePath("/events")
     revalidatePath("/[username]", "page")
+    return true
   }
 )
 
@@ -62,6 +63,7 @@ export const updateEvent = createSafeAction(
     // updated successfully
     revalidatePath("/events")
     revalidatePath("/[username]", "page")
+    return true
   }
 )
 
