@@ -20,23 +20,10 @@
     "heading": "Turn your business ideas into reality",
     "subheading": "We do consulting for every step of your business.",
     "cta": "Book a free consultation",
-    "stats": [
-      {
-        "order": 0,
-        "number": "100+",
-        "caption": "businesses served"
-      },
-      {
-        "order": 1,
-        "number": "99%",
-        "caption": "client satisfaction"
-      },
-      {
-        "order": 2,
-        "number": "5x",
-        "caption": "average ROI"
-      }
-    ]
+    "image": {
+      "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "alt": "Hero image depicting office buildings"
+    }
   },
   "services": {
     "badge": "Our Services",
@@ -63,6 +50,40 @@
         "features": ["React & Next.js", "TypeScript", "Performance Optimized"],
         "iconColor": "text-orange-500",
         "bgColor": "bg-orange-500/10"
+      }
+    ]
+  },
+  "about": {
+    "badge": "About Us",
+    "heading": "Helping you make the right business decisions",
+    "subheading": "We are a team of passionate designers, developers, and strategists who believe in creating thoughtful digital experiences that solve real problems. Our approach combines deep technical expertise with a human-centered design philosophy.",
+    "content": {
+      "title": "Our Core Competencies",
+      "competencies": [
+        "User-centered design approach",
+        "Agile development methodology",
+        "Full-stack engineering expertise",
+        "End-to-end product strategy",
+        "Enterprise-grade security",
+        "24/7 customer support"
+      ]
+    },
+    "image": {
+      "url": "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "alt": "Banner image depicting a business meeting"
+    },
+    "stats": [
+      {
+        "number": "100+",
+        "caption": "clients served"
+      },
+      {
+        "number": "98%",
+        "caption": "client satisfaction"
+      },
+      {
+        "number": "5x",
+        "caption": "average ROI"
       }
     ]
   },
@@ -96,6 +117,11 @@
       "title": "✅ Booking successful!",
       "message": "Make sure to accept your invite, it will be emailed to you shortly."
     }
+  },
+  "notfound": {
+    "heading": "Page Not Found",
+    "subheading": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    "action": "Return Home"
   },
   "footer": {
     "heading": "K & A Consulting Ltd, All rights reserved",
