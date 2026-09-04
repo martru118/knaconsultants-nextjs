@@ -2,7 +2,7 @@
 
 import { LogoIcon } from "@/components/logo";
 import Link from "next/link";
-import { footer } from "@/public/locales/en/common.json"
+import { header } from "@/public/locales/en/common.json"
 
 export function Footer() {
   return (
@@ -14,12 +14,12 @@ export function Footer() {
               <LogoIcon />
             </Link>
             <span className="text-muted-foreground block text-center text-sm">
-              © {new Date().getFullYear()} {footer.heading}
+              © {new Date().getFullYear()} {header.footer}
             </span>
           </div>
 
           <div className="order-first flex flex-wrap gap-x-6 gap-y-4 md:order-last">
-            {footer.nav.map((link, index) => (
+            {header.nav.map((link, index) => (
               <Link
                 key={index}
                 href={link.href}

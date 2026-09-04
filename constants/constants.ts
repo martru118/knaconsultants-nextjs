@@ -20,12 +20,11 @@ export const DAYS_OF_WEEK_IN_ORDER = [
   "sunday",
 ] as const
 
-// booking form selector schema
-export const spokenLanguages = [
+// TODO: add i18n in a future update
+export const locales = [
   { label: "English", value: "en" },
-  { label: "Cantonese (粵語)", value: "zh-yue" },
-  { label: "Mandarin (普通話)", value: "zh" },
-  { label: "Vietnamese (Tiếng Việt)", value: "vi" },
+  { label: "中文", value: "zh" },
+  { label: "Tiếng Việt", value: "vi" },
 ] as const
 
 // constant strings

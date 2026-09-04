@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { Menu, Phone, X } from "lucide-react";
+import { Menu, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import CreateEventButton from "@/components/events/CreateEventButton";
 import UserMenu from "./UserMenu";
 import { header } from "@/public/locales/en/common.json"
@@ -124,13 +124,8 @@ function ActionButton() {
 
   return <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
     <SignedOut>
-      {/*
-      <SignInButton forceRedirectUrl="/dashboard">
-        <Button variant="outline">Login</Button>
-      </SignInButton>
-      */}
       <Button className="cursor-pointer" onClick={() => router.push(`/${userProfile}`)}>
-        <Phone data-icon="inline-start" className="mr-1" />
+        <Video data-icon="inline-start" className="mr-1" />
         {header.action}
       </Button>
     </SignedOut>

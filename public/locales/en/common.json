@@ -1,6 +1,7 @@
 {
   "header": {
     "action": "Book a call",
+    "footer": "K & A Consulting Ltd, All rights reserved",
     "nav": [
       {
         "title": "Our Services",
@@ -87,6 +88,28 @@
       }
     ]
   },
+  "contact": {
+    "badge": "Contact",
+    "heading": "Let's get in touch",
+    "subheading": "Have a question or ready to start your project? We're here to help you find the perfect solution.",
+    "content": [
+      {
+        "title": "Email us",
+        "desc": "We respond to all emails within 24 hours.",
+        "label": "hello@example.com"
+      },
+      {
+        "title": "Call us",
+        "desc": "Speak directly with a member of our team.",
+        "label": "(123) 456-7890"
+      },
+      {
+        "title": "Book a meeting",
+        "desc": "Schedule a personalized video call with us.",
+        "label": "Schedule now"
+      }
+    ]
+  },
   "profile": {
     "heading": "Welcome to my scheduling page! Please select an event to book a call with me.",
     "empty": "No public events available.",
@@ -122,22 +145,5 @@
     "heading": "Page Not Found",
     "subheading": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
     "action": "Return Home"
-  },
-  "footer": {
-    "heading": "K & A Consulting Ltd, All rights reserved",
-    "nav": [
-      {
-        "title": "Our Services",
-        "href": "/#services"
-      },
-      {
-        "title": "About Us",
-        "href": "/#about"
-      },
-      {
-        "title": "Contact",
-        "href": "/#contact"
-      }
-    ]
   }
 }
