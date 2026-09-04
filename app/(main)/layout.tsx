@@ -1,20 +1,16 @@
-"use client";
-
+import { AppHeader } from "@/components/dashboard/AppHeader";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import UserMenu from "@/components/UserMenu";
-import { getPathTitle } from "@/lib/helper";
-import { usePathname } from "next/navigation";
+import { checkUser } from "@/lib/check-user";
 import React from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-function AppLayout({ children }: LayoutProps) {
-  const pathname = usePathname();
-  const title = getPathTitle(pathname.slice(1))
+async function AppLayout({ children }: LayoutProps) {
+  await checkUser()
 
   return (
     <TooltipProvider>
@@ -22,11 +18,7 @@ function AppLayout({ children }: LayoutProps) {
         <AppSidebar />
         {/* ---------------- Main ---------------- */}
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-50 bg-primary-foreground md:border-x flex h-14 items-center justify-between border-b px-4">
-            <SidebarTrigger className="cursor-pointer"/>
-            <span>{title}</span>
-            <UserMenu />
-          </header>
+          <AppHeader />
           <main className="flex-1 p-4">
             {children}
           </main>

@@ -3,16 +3,9 @@
 import { UserButton, useUser } from "@clerk/nextjs";
 import { CircleUser, LayoutDashboard } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { useEffect } from "react";
-import { syncUserChanges } from "@/actions/users";
 
 export default function UserMenu() {
   const {isLoaded, user} = useUser()
-
-  // sync changes between Clerk and db
-  useEffect(() => {
-    (async () => await syncUserChanges())();
-  }, [isLoaded]);
 
   if (!isLoaded) {
     // fixes Clerk button hydration bug

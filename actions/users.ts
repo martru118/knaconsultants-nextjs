@@ -1,9 +1,8 @@
 "use server";
 
-import { getOwnership } from "@/lib/check-user";
 import { db } from "@/lib/prisma";
 import { usernameSchema } from "@/lib/validators";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { cache } from "react";
 import z from "zod";
 
@@ -76,30 +75,3 @@ async function getProfileUsername(email: string) {
 }
 
 export const cachedUserProfile = cache(getProfileUsername)
-
-export async function syncUserChanges() {
-  const user = await currentUser()
-  if (!user) throw new Error("Unauthorized");
-
-  try {
-    // user is logged in
-    const loggedInUser = await getOwnership(user.id)
-
-    if (loggedInUser) {
-      // check for name or profile picutre mismatch
-      if (loggedInUser.name !== user.fullName || loggedInUser.imageUrl !== user.imageUrl) {
-        await db.user.update({
-          where: {
-            clerkUserId: user.id,
-          },
-          data: {
-            name: user.fullName,
-            imageUrl: user.imageUrl
-          }
-        })
-      }
-    }
-  } catch (error: any) {
-    throw new Error(`Problem syncing user: ${error.message}`)
-  }
-}

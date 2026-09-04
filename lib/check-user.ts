@@ -4,12 +4,31 @@ import { cache } from "react";
 
 export async function checkUser() {
   const user = await currentUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return null
 
   try {
-    // user already exists
+    // user is logged in
     const loggedInUser = await getOwnership(user.id)
-    if (loggedInUser) return loggedInUser
+    
+    if (loggedInUser) {
+      // check for name and profile picture mismatch
+      if (loggedInUser.name !== user.fullName || loggedInUser.imageUrl !== user.imageUrl) {
+        const syncedUser = await db.user.update({
+          where: {
+            clerkUserId: user.id,
+          },
+          data: {
+            name: user.fullName,
+            imageUrl: user.imageUrl
+          }
+        })
+
+        return syncedUser
+      }
+
+      // current user session
+      return loggedInUser
+    }
 
     // generate dummy username based on slug
     const name = `${user.firstName} ${user.lastName}`;
@@ -19,7 +38,7 @@ export async function checkUser() {
     })
 
     // add new user to database
-    await db.user.create({
+    const newUser = await db.user.create({
       data: {
         clerkUserId: user.id,
         name,
@@ -28,8 +47,10 @@ export async function checkUser() {
         username: slug,
       }
     })
-  } catch (error: any) {
-    throw new Error(`Problem creating user: ${error.message}`)
+
+    return newUser
+  } catch (error) {
+    console.error(error)
   }
 }
 
