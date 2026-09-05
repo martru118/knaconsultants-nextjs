@@ -36,7 +36,7 @@ function BookingForm({ availability }: BookingFormProps) {
       <div className="text-center my-auto">
         <h2 className="text-2xl font-bold mb-4">✅ Booking successful!</h2>
         {bookingData && (
-          <p>
+          <p className="text-muted-foreground">
             {booking.success.message}<br/>
             Join the meeting:{" "}
             <a

@@ -12,6 +12,7 @@ import { notFound } from "next/navigation";
 import { profile } from "@/public/locales/en/common.json";
 import { Logo } from "@/components/logo";
 import { Footer } from "@/components/Footer";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface PageProps {
   params: Promise<{username: string}>
@@ -58,6 +59,7 @@ async function UserPage({params}: PageProps) {
 
           <div className="flex items-center gap-4">
             <SignedOut>
+              <ThemeToggle />
               <Logo />
             </SignedOut>
             <SignedIn>
@@ -75,7 +77,7 @@ async function UserPage({params}: PageProps) {
             </AvatarFallback>
           </Avatar>
           <h1 className="text-3xl font-bold mb-2">{user.name}</h1>
-          <p className="text-gray-600 text-center">
+          <p className="text-muted-foreground text-center">
             {profile.heading}
           </p>
         </div>

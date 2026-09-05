@@ -14,6 +14,7 @@ import { useProfileStore } from "@/hooks/use-profile";
 import { emailAddress } from "@/constants/constants";
 import { useRouter } from "next/navigation";
 import { useShallow } from "zustand/react/shallow";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Navbar() {
   const [menuState, setMenuState] = useState(false);
@@ -62,14 +63,17 @@ export function Navbar() {
               </Link>
 
               {/* Mobile navbar hamburger button */}
-              <button
-                onClick={() => setMenuState(!menuState)}
-                aria-label={menuState == true ? "Close Menu" : "Open Menu"}
-                className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
-              >
-                <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
-                <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
-              </button>
+              <div className="flex flex-row space-x-4 lg:-ml-2">
+                <ThemeToggle />
+                <button
+                  onClick={() => setMenuState(!menuState)}
+                  aria-label={menuState == true ? "Close Menu" : "Open Menu"}
+                  className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
+                >
+                  <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
+                  <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
+                </button>
+              </div>
 
               {/* Desktop navbar */}
               <div className="m-auto hidden size-fit lg:block">
@@ -129,11 +133,10 @@ function ActionButton() {
         {header.action}
       </Button>
     </SignedOut>
+
     <SignedIn>
-      <div className="flex flex-row space-x-2 justify-between">
-        <CreateEventButton />
-        <UserMenu />
-      </div>
+      <CreateEventButton />
+      <UserMenu />
     </SignedIn>
   </div>
 }

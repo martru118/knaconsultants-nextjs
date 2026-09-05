@@ -38,13 +38,15 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
           after: addDays(today, 30),
         }}
         classNames={{
-          selected: `font-bold outline-3 outline-blue-700 w-10 h-10 rounded-full`,
+          selected: `font-bold outline-3 outline-ring w-10 h-10 rounded-full`,
+          today: `text-primary`,
+          chevron: `fill-secondary-foreground`
         }}
         modifiers={{
           available: availabilities,
         }}
         modifiersClassNames={{
-          available: `bg-indigo-200 w-10 h-10 rounded-full`,
+          available: `bg-secondary w-10 h-10 rounded-full`,
         }}
       />
     </div>

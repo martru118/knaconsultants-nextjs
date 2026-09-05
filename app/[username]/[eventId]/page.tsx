@@ -76,8 +76,8 @@ function EventDetailsLoader() {
 
 function BookingLoader() {
   return <div className="flex flex-col w-full m-auto gap-2 items-center">
-    <BeatLoader size={20} />
-    <p>{booking.loading}</p>
+    <BeatLoader color="var(--color-indigo-500)" size={20} />
+    <p className="text-muted-foreground">{booking.loading}</p>
   </div>
 }
 

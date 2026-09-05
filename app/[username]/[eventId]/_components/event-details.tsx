@@ -42,7 +42,7 @@ export default function EventDetailsCard({event}: EventDetailsProps) {
         </Avatar>
         <div>
           <h2 className="text-xl font-semibold">{user.name}</h2>
-          <p className="text-gray-600">{user.email}</p>
+          <p className="text-muted-foreground">{user.email}</p>
         </div>
       </div>
 
@@ -54,7 +54,7 @@ export default function EventDetailsCard({event}: EventDetailsProps) {
         <Globe className="mr-2" />
         <span>{tzString}</span>
       </div>
-      <p className="text-gray-700">{event.description}</p>
+      <p className="text-muted-foreground">{event.description}</p>
     </div>
   );
 }

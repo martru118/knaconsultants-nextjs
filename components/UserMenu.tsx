@@ -9,13 +9,13 @@ export default function UserMenu() {
 
   if (!isLoaded) {
     // fixes Clerk button hydration bug
-    return <Skeleton className="h-10 w-10 rounded-full" />
+    return <Skeleton className="h-8 w-8 rounded-full" />
   } else {
     // render Clerk button normally
     const profile = user?.username
     return <UserButton appearance={{
       elements: {
-        avatarBox: "w-10 h-10"
+        avatarBox: "w-8 h-8"
       }
     }}>
       <UserButton.MenuItems>

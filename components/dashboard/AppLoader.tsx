@@ -10,7 +10,7 @@ export function AppLoader() {
 
 	return (
     <div className="flex flex-col w-full pt-20 m-auto gap-5 items-center">
-      <MoonLoader size={100} color="#4f39f6" />
+      <MoonLoader size={100} color="var(--color-indigo-500)" />
       <span>Loading {title}...</span>
     </div>
 	);

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { hero } from "@/public/locales/en/common.json"
 import { RainbowButton } from "./ui/rainbow-button";
 import { useProfileStore } from "@/hooks/use-profile";
@@ -25,8 +25,8 @@ export function HeroSection() {
               <div className="flex items-center justify-center gap-3">
                 <RainbowButton asChild size="lg">
                   <Link href={`/${userProfile}`} prefetch={false}>
-                    <span className="text-nowrap">{hero.cta}</span>
-                    <ChevronRight className="ml-1" />
+                    <span className="text-nowrap text-white dark:text-black">{hero.cta}</span>
+                    <ArrowRight className="ml-2 h-4 w-4 text-white dark:text-black" />
                   </Link>
                 </RainbowButton>
               </div>
