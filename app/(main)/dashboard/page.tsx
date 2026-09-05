@@ -74,12 +74,18 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
                 <ul className="list-disc ml-4">
                   {upcomingMeetings?.map((meeting) => (
                     <li key={meeting.id}>
-                      {meeting.event.title} on{" "}
-                      {format(
+                      <a 
+                        href={meeting.meetLink}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {meeting.event.title} with {meeting.name} 
+                      </a>{" "}
+                      on {format(
                         new Date(meeting.startTime),
                         "MMM d, yyyy h:mm a"
-                      )}{" "}
-                      with {meeting.name}
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -104,6 +110,7 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<z.infer<typeof usernameSchema>>({
     resolver: zodResolver(usernameSchema),
@@ -123,10 +130,12 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
   async function onSubmitForm(data: z.infer<typeof usernameSchema>) {
     const response = await fnUpdateUsername({ username: data.username });
 
-    // handle success state
+    // handle success and error states
     if (response) {
       setIsUpdated(true)
       window.alert("Username changed successfully")
+    } else {
+      setError("username", { message: "Username already taken" })
     }
   }
 
@@ -134,8 +143,8 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
     <Card>
       <CardHeader>
         <CardTitle>Your unique link</CardTitle>
-        <p className="text-sm font-light">
-          Last updated: {isUpdated? "Just now" : user?.updatedAt.toLocaleString()}
+        <p className="text-sm font-light text-muted-foreground">
+          Last updated: {isUpdated? "Just now" : format(new Date(user.updatedAt), "MMMM d, yyyy h:mm a")}
         </p>
       </CardHeader>
 
@@ -186,7 +195,7 @@ function OnboardingAlert() {
       <AlertTriangleIcon />
       <AlertTitle>Connect your Google Account</AlertTitle>
       <AlertDescription>
-        To allow clients to book meetings with you, you must connect your Google Account first.
+        You must connect your Google Account to allow clients to book meetings with you.
       </AlertDescription>
 
       <AlertAction>

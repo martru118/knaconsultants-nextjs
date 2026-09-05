@@ -19,9 +19,7 @@ export async function updateUsername(user: z.infer<typeof usernameSchema>) {
     },
   });
 
-  if (existingUsername && existingUsername.id !== userId) {
-    throw new Error("Username is already taken");
-  }
+  if (existingUsername && existingUsername.id !== userId) return false
 
   // update username in database
   await db.user.update({
