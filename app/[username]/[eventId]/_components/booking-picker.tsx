@@ -8,6 +8,7 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { booking } from "@/public/locales/en/common.json"
 import { useShallow } from "zustand/react/shallow";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const today = new Date()
 
@@ -22,7 +23,7 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
   const setDate = useDayPicker(useShallow(state => state.setDate))
   const setTime = useDayPicker(useShallow(state => state.setTime))
 
-  return <div className="md:h-90 flex flex-col md:flex-row gap-5">
+  return <div className="md:h-85 flex flex-col md:flex-row gap-5">
     <div className="max-w-full">
       <DayPicker 
         mode="single" 
@@ -52,7 +53,7 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
     </div>
     <Separator className="lg:visible" orientation="vertical" />
 
-    <div className="max-w-full h-full mt-2 md:overflow-scroll no-scrollbar">
+    <div className="max-w-full h-full mt-2">
       <div className="mb-5">
         <h3 className="text-lg font-semibold mb-2">
           {booking.heading}
@@ -61,27 +62,29 @@ export function BookingDayPicker({ availabilities, slots }: DayPickerProps) {
           <p className="text-md">{booking.empty}</p>
         )}
         {selectedDate && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {slots.map(slot => {
-              return (                  
-                <Button 
-                  key={slot} 
-                  onClick={() => {
-                    setTime(slot)
+          <ScrollArea className="h-52 md:h-72 pr-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {slots.map(slot => {
+                return (                  
+                  <Button 
+                    key={slot} 
+                    onClick={() => {
+                      setTime(slot)
 
-                    // scroll to form section on click
-                    setTimeout(() => {                          
-                      const element = document.getElementById("booking-submit")
-                      element?.scrollIntoView({ behavior: "smooth" })
-                    }, 10);
-                  }}
-                  variant={selectedTime === slot? "default" : "outline"}
-                >
-                  {slot}
-                </Button>
-              )
-            })}
-          </div>
+                      // scroll to form section on click
+                      setTimeout(() => {                          
+                        const element = document.getElementById("booking-submit")
+                        element?.scrollIntoView({ behavior: "smooth" })
+                      }, 10);
+                    }}
+                    variant={selectedTime === slot? "default" : "outline"}
+                  >
+                    {slot}
+                  </Button>
+                )
+              })}
+            </div>
+          </ScrollArea>
         )}
       </div>
     </div>
