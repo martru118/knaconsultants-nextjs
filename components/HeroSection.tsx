@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { hero } from "@/public/locales/en/common.json"
+import { hero } from "@/public/messages/en.json";
 import { RainbowButton } from "./ui/rainbow-button";
 import { useProfileStore } from "@/hooks/use-profile";
 
@@ -10,8 +10,7 @@ export function HeroSection() {
   const userProfile = useProfileStore(state => state.profile)
 
   return (
-    <main>
-      <section className="before:bg-muted border-e-foreground relative overflow-hidden before:absolute before:inset-1 before:h-[calc(100%-8rem)] before:rounded-2xl sm:before:inset-2 md:before:rounded-[2rem] lg:before:h-[calc(100%-14rem)]">
+      <section className="before:bg-muted border-e-foreground relative overflow-hidden before:absolute before:inset-1 before:h-[calc(100%-8rem)] before:rounded-2xl sm:before:inset-2 md:before:rounded-4xl lg:before:h-[calc(100%-14rem)]">
         <div className="py-20 md:py-36">
           <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
             <div>
@@ -48,6 +47,5 @@ export function HeroSection() {
           </div>
         </div>
       </section>
-    </main>
   );
 }

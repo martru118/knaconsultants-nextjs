@@ -1,7 +1,8 @@
 {
   "header": {
     "action": "Book a call",
-    "footer": "K & A Consulting Ltd, All rights reserved",
+    "footer": "K & A Consultants Limited, All rights reserved",
+    "alt": "K & A Consultants Ltd.",
     "nav": [
       {
         "title": "Our Services",
@@ -34,7 +35,7 @@
       {
         "title": "Financing",
         "desc": "Get accepted for loans, leases, and mortgages to launch your business",
-        "features": ["Bank loans", "Property leasing", "Mortgages"],
+        "features": ["Business loans", "Personal loans", "Mortgages"],
         "iconColor": "text-blue-500",
         "bgColor": "bg-blue-500/10"
       },

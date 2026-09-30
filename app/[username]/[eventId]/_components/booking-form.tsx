@@ -7,7 +7,7 @@ import { useDayPicker } from "@/hooks/use-daypicker";
 import { dateFormat, tzString } from "@/constants/constants";
 import { BookingDayPicker } from "./booking-picker";
 import { BookingInput } from "./booking-input";
-import { booking } from "@/public/locales/en/common.json"
+import { booking } from "@/public/messages/en.json"
 
 interface BookingFormProps {
   availability: Record<string, string[]>

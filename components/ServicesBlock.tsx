@@ -8,7 +8,7 @@ import {
   Drill,
   PlaneLanding,
 } from "lucide-react";
-import { services } from "@/public/locales/en/common.json";
+import { services } from "@/public/messages/en.json";
 
 // header icons for each card
 const iconCards = [BadgeDollarSign, PlaneLanding, Drill]
@@ -48,7 +48,7 @@ export function ServicesBlock() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 whileHover={{ y: -5 }}
               >
-                <Card className="group relative h-full overflow-hidden border-border/50 bg-card p-4 transition-all hover:border-accent hover:shadow-xl md:p-6">
+                <Card className="group relative h-full overflow-hidden border-border/50 bg-card p-4 transition-all hover:border-accent/50 hover:shadow-xl md:p-6">
                   {/* Gradient overlay */}
                   <motion.div
                     className={`absolute inset-0 ${service.bgColor} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}

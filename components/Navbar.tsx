@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Logo from "@/assets/logo/logo.svg";
 import { Menu, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -9,12 +8,13 @@ import { cn } from "@/lib/utils";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import CreateEventButton from "@/components/events/CreateEventButton";
 import UserMenu from "./UserMenu";
-import { header } from "@/public/locales/en/common.json"
+import { header } from "@/public/messages/en.json";
 import { useProfileStore } from "@/hooks/use-profile";
 import { emailAddress } from "@/constants/constants";
 import { useRouter } from "next/navigation";
 import { useShallow } from "zustand/react/shallow";
 import { ThemeToggle } from "./ThemeToggle";
+import Logo from "./Logo";
 
 export function Navbar() {
   const [menuState, setMenuState] = useState(false);
@@ -57,9 +57,9 @@ export function Navbar() {
               <Link
                 href="/"
                 aria-label="home"
-                className="flex items-center space-x-2 w-10 h-10 dark:invert"
+                className="flex items-center space-x-2"
               >
-                <Logo />
+                <Logo size={42} />
               </Link>
 
               {/* Mobile navbar hamburger button */}

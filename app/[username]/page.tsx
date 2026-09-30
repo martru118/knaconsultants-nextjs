@@ -9,7 +9,7 @@ import { Home, User } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { profile } from "@/public/locales/en/common.json";
+import { profile } from "@/public/messages/en.json";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 

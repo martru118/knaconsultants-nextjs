@@ -15,7 +15,7 @@ import { Asterisk, CalendarDays } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
-import { booking } from "@/public/locales/en/common.json"
+import { booking } from "@/public/messages/en.json"
 import { useShallow } from "zustand/react/shallow";
 
 interface BookingInterface {

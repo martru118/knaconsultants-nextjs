@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { tzString } from "@/constants/constants";
 import { ArrowLeft, Clock, Globe } from "lucide-react";
 import Link from "next/link";
-import { booking } from "@/public/locales/en/common.json"
+import { booking } from "@/public/messages/en.json"
 import { useDayPicker } from "@/hooks/use-daypicker";
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -36,7 +36,7 @@ export default function EventDetailsCard({event}: EventDetailsProps) {
       <div className="flex items-center mb-4">
         <Avatar className="w-12 h-12 mr-4">
           <AvatarImage className="rounded-full" src={user.imageUrl!} alt={user.name!} />
-          <AvatarFallback className="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
+          <AvatarFallback className="inline-flex items-center justify-center w-12 h-12 text-xl text-white bg-linear-to-r from-blue-600 to-blue-400 rounded-full">
             {user.name?.charAt(0)}
           </AvatarFallback>
         </Avatar>

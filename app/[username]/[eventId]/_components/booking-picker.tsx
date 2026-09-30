@@ -6,7 +6,7 @@ import { useDayPicker } from "@/hooks/use-daypicker";
 import { addDays } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { booking } from "@/public/locales/en/common.json"
+import { booking } from "@/public/messages/en.json"
 import { useShallow } from "zustand/react/shallow";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

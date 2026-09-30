@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { notfound } from "@/public/locales/en/common.json"
+import { notfound } from "@/public/messages/en.json"
 
 export default function NotFound() {
   return (

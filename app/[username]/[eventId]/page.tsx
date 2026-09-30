@@ -8,7 +8,7 @@ import { cachedEventAvailability } from "@/actions/availability";
 import { BeatLoader } from "react-spinners";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/Footer";
-import { booking } from "@/public/locales/en/common.json"
+import { booking } from "@/public/messages/en.json"
 
 interface PageProps {
   params: Promise<{username: string, eventId: string}>
