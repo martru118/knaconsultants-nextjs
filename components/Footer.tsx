@@ -1,19 +1,19 @@
 "use client"
 
-import { LogoIcon } from "@/components/logo";
+import Logo from "@/assets/logo/logo.svg";
 import Link from "next/link";
 import { header } from "@/public/locales/en/common.json"
 
 export function Footer() {
   return (
-    <footer className="bg-background border-b py-8">
+    <footer className="bg-background border-b py-6 overflow-y-hidden">
       <div className="mx-auto max-w-5xl px-6">
         <div className="flex flex-wrap justify-between gap-12">
           <div className="order-last flex items-center gap-3 md:order-first">
-            <Link href="/" aria-label="go home">
-              <LogoIcon />
+            <Link href="/" aria-label="go home" className="flex items-center space-x-2 w-8 h-8 dark:invert">
+              <Logo />
             </Link>
-            <span className="text-muted-foreground block text-center text-sm">
+            <span className="text-muted-foreground block text-start text-sm">
               © {new Date().getFullYear()} {header.footer}
             </span>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Logo } from "@/components/logo";
+import Logo from "@/assets/logo/logo.svg";
 import { Menu, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -57,13 +57,13 @@ export function Navbar() {
               <Link
                 href="/"
                 aria-label="home"
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 w-10 h-10 dark:invert"
               >
                 <Logo />
               </Link>
 
               {/* Mobile navbar hamburger button */}
-              <div className="flex flex-row space-x-4 lg:-ml-2">
+              <div className="flex flex-row space-x-4 my-auto lg:-ml-2">
                 <ThemeToggle />
                 <button
                   onClick={() => setMenuState(!menuState)}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
-import { Logo } from "@/components/logo";
+import Logo from "@/assets/logo/logo.svg";
 import { NavItem, NavMain } from "@/components/dashboard/NavMain";
 import { Calendar, Clock, LayoutDashboard, Users } from "lucide-react";
 import CreateEventButton from "../events/CreateEventButton";
@@ -17,13 +17,13 @@ export const navData: NavItem[] = [
 
 export function AppSidebar() {
   return (
-    <Sidebar className="px-0 h-full [&_[data-slot=sidebar-inner]]:h-full">
+    <Sidebar className="px-0 h-full **:data-[slot=sidebar-inner]:h-full">
       {/* ---------------- Header ---------------- */}
       <SidebarHeader className="py-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <a href="/" className="w-full h-full">
-              <Logo uniColor />
+            <a href="/" className="flex items-center mx-auto w-25 h-25 dark:invert">
+              <Logo />
             </a>
           </SidebarMenuItem>
         </SidebarMenu>

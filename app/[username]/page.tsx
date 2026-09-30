@@ -10,7 +10,6 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { profile } from "@/public/locales/en/common.json";
-import { Logo } from "@/components/logo";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -60,7 +59,6 @@ async function UserPage({params}: PageProps) {
           <div className="flex items-center gap-4">
             <SignedOut>
               <ThemeToggle />
-              <Logo />
             </SignedOut>
             <SignedIn>
               <CreateEventButton />
@@ -72,7 +70,7 @@ async function UserPage({params}: PageProps) {
         <div className="flex flex-col items-center mb-8">
           <Avatar className="w-24 h-24 mb-4">
             <AvatarImage className="rounded-full" src={user.imageUrl!} alt={user.name!} />
-            <AvatarFallback className="inline-flex items-center justify-center w-24 h-24 text-7xl text-white font-bold bg-gradient-to-r from-blue-600 to-blue-400 rounded-full">
+            <AvatarFallback className="inline-flex items-center justify-center w-24 h-24 text-7xl text-white font-bold bg-linear-to-r from-blue-600 to-blue-400 rounded-full">
               <User className="w-16 h-16" />
             </AvatarFallback>
           </Avatar>
