@@ -11,7 +11,7 @@ export function AppHeader() {
   const title = getPathTitle(pathname.slice(1))
 
   return (
-    <header className="sticky top-0 z-50 md:border-x flex h-14 items-center justify-between border-b px-4">
+    <header className="sticky bg-background top-0 z-50 md:border-x flex h-14 items-center justify-between border-b px-4">
       <SidebarTrigger className="cursor-pointer"/>
       <span>{title}</span>
       <div className="flex flex-row space-x-2">

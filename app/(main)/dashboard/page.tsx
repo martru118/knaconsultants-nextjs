@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useClerk, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usernameSchema } from "@/lib/validators";
@@ -14,33 +13,24 @@ import { cachedLatestMeetings } from "@/actions/meetings";
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import { User } from "@clerk/nextjs/server";
-import { AlertTriangleIcon } from "lucide-react";
-import { Alert, AlertTitle, AlertDescription, AlertAction } from "@/components/ui/alert";
 import { domain } from "@/constants/constants";
 import { useProfileStore } from "@/hooks/use-profile";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { AppLoader } from "@/components/dashboard/AppLoader";
 
-interface LatestUpdatesProps {
-  user: User
-}
-
-interface UniqueLinkProps {
-  response: boolean,
+interface DashboardProps {
   user: User
 }
 
 function Dashboard() {
   const { isLoaded, user } = useUser();
-  const providers = user?.externalAccounts.map(account => account.provider)
 
   if (isLoaded) {
     return (
       <div className="space-y-5">
-        {!providers?.includes("google") && <OnboardingAlert />}
         <LatestMeetingsCard user={user as any} />
-        <UniqueLinkCard response={isLoaded} user={user as any} />
+        <UniqueLinkCard user={user as any} />
       </div>
     );
   } else {
@@ -49,7 +39,7 @@ function Dashboard() {
   }
 }
 
-function LatestMeetingsCard({user}: LatestUpdatesProps) {
+function LatestMeetingsCard({user}: DashboardProps) {
   const {
     loading,
     data: upcomingMeetings,
@@ -102,18 +92,20 @@ function LatestMeetingsCard({user}: LatestUpdatesProps) {
   )
 }
 
-function UniqueLinkCard({response, user}: UniqueLinkProps) {
+function UniqueLinkCard({user}: DashboardProps) {
   const isUpdated = useProfileStore(state => state.isUpdated)
   const setIsUpdated = useProfileStore(state => state.setIsUpdated)
 
   const {
     register,
     handleSubmit,
-    setValue,
     setError,
     formState: { errors },
   } = useForm<z.infer<typeof usernameSchema>>({
     resolver: zodResolver(usernameSchema),
+    defaultValues: {
+      username: user?.username || ""
+    }
   });
 
   const {
@@ -121,11 +113,6 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
     error: e,
     fn: fnUpdateUsername,
   } = useFetch(updateUsername);
-  
-  useEffect(() => {
-    // get username from clerk
-    setValue("username", user?.username || "");
-  }, [response]);
 
   async function onSubmitForm(data: z.infer<typeof usernameSchema>) {
     const response = await fnUpdateUsername({ username: data.username });
@@ -183,32 +170,6 @@ function UniqueLinkCard({response, user}: UniqueLinkProps) {
         </form>
       </CardContent>
     </Card>
-  )
-}
-
-function OnboardingAlert() {
-  const { openUserProfile } = useClerk()
-  
-  // show when user is missing Google Account
-  return (
-    <Alert className="max-w-full border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
-      <AlertTriangleIcon />
-      <AlertTitle>Connect your Google Account</AlertTitle>
-      <AlertDescription>
-        You must connect your Google Account to allow clients to book meetings with you.
-      </AlertDescription>
-
-      <AlertAction>
-        <Button 
-          onClick={() => openUserProfile() }
-          className="bg-amber-900 hover:bg-amber-700" 
-          size="xs" 
-          variant="default"
-        >
-          Connect
-        </Button>
-      </AlertAction>
-    </Alert>
   )
 }
 

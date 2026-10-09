@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/dashboard/AppHeader";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
+import { OnboardingAlert } from "@/components/dashboard/AppAlert";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { checkUser } from "@/lib/check-user";
@@ -20,6 +21,7 @@ async function AppLayout({ children }: LayoutProps) {
         <div className="flex flex-1 flex-col">
           <AppHeader />
           <main className="flex-1 p-4">
+            <OnboardingAlert />
             {children}
           </main>
         </div>

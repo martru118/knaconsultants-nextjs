@@ -4,11 +4,11 @@ import z from "zod";
 export const usernameSchema = z.object({
   username: z
     .string()
-    .min(3)
-    .max(20)
+    .min(4)
+    .max(64)
     .regex(
-      /^[a-zA-Z0-9-]+$/,
-      "Username can only contain letters, numbers, and hyphens"
+      /^[a-z0-9-]+$/,
+      "Username can only contain lowercase letters, numbers, and hyphens"
     ),
 });
 

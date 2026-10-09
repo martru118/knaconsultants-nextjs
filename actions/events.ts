@@ -53,10 +53,7 @@ export const updateEvent = createSafeAction(
         userId: user.id,
       },
       data: {
-        title: validatedData.title,
-        description: validatedData.description,
-        duration: validatedData.duration,
-        isPrivate: validatedData.isPrivate,
+        ...validatedData
       },
     })
 

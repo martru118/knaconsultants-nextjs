@@ -1,37 +1,37 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { db } from "./prisma";
+import { generateSlug } from "./helper";
 
 export async function checkUser() {
   const user = await currentUser()
   if (!user) return null
 
   try {
-    // user is logged in
     const loggedInUser = await getOwnership(user.id)
     
-    if (loggedInUser) {
-      // check for name and profile picture mismatch
-      if (loggedInUser.name !== user.fullName || loggedInUser.imageUrl !== user.imageUrl) {
-        const syncedUser = await db.user.update({
-          where: {
-            clerkUserId: user.id,
-          },
-          data: {
-            name: user.fullName,
-            imageUrl: user.imageUrl
-          }
-        })
+    // check for name and profile picture mismatch
+    if (loggedInUser.name !== user.fullName || loggedInUser.imageUrl !== user.imageUrl) {
+      const syncedUser = await db.user.update({
+        where: {
+          clerkUserId: user.id,
+        },
+        data: {
+          name: user.fullName,
+          imageUrl: user.imageUrl
+        }
+      })
 
-        return syncedUser
-      }
-
-      // current user session
-      return loggedInUser
+      return syncedUser
     }
 
-    // generate dummy username based on slug
+    // current user session
+    return loggedInUser
+  } catch (error) {
+    // create new user on error
     const name = `${user.firstName} ${user.lastName}`;
-    const slug = name.toLowerCase().split(" ").join("-") + user.id.slice(-4);
+    const slug = generateSlug(name, user.id);
+    
+    // generate dummy username for new user
     (await clerkClient()).users.updateUser(user.id, {
       username: slug
     })
@@ -48,8 +48,6 @@ export async function checkUser() {
     })
 
     return newUser
-  } catch (error) {
-    console.error(error)
   }
 }
 
